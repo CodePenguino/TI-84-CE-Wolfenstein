@@ -1,6 +1,11 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
-#include <stdlib.h>
+#include "fixed.h"
+#include "color.h"
+//#include <stdlib.h>
+
+#define MEM_VRAM 0xD40000
+volatile uint16_t* VRAM = (uint16_t*)0xD40000;
 
 /* Main function, called first */
 int main(void)
@@ -9,7 +14,10 @@ int main(void)
 	os_ClrHome();
 
 	/* Print a string */
-	os_PutStrFull("Hello world!");
+	os_PutStrFull("Hello world");
+
+	// Draw single red pixel at the top left
+	VRAM[0] = RGB15(31, 0, 0);
 
 	/* Waits for a key */
 	while (!os_GetCSC())

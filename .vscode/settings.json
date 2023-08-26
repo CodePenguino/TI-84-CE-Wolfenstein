@@ -1,5 +1,6 @@
 {
     "C_Cpp.default.includePath": [
         "C:/CEdev/include"
-    ]
+    ],
+    "C_Cpp.errorSquiggles": "disabled"
 }
