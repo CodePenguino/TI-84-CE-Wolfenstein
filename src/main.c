@@ -9,7 +9,7 @@ int main(void)
 	os_ClrHome();
 
 	/* Print a string */
-	os_PutStrFull("Ligma balls");
+	os_PutStrFull("Hello world!");
 
 	/* Waits for a key */
 	while (!os_GetCSC())
