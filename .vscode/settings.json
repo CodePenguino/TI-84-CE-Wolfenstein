@@ -2,5 +2,11 @@
     "C_Cpp.default.includePath": [
         "C:/CEdev/include"
     ],
-    "C_Cpp.errorSquiggles": "disabled"
+    "C_Cpp.errorSquiggles": "disabled",
+    "files.associations": {
+        "getcsc.h": "c",
+        "getkey.h": "c",
+        "color.h": "c",
+        "keypadc.h": "c"
+    }
 }

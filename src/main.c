@@ -1,11 +1,16 @@
 #include <ti/screen.h>
 #include <ti/getcsc.h>
+#include <stdio.h>
 #include "fixed.h"
 #include "color.h"
-//#include <stdlib.h>
+#include "input.h"
+#include <string.h>
+#include "util.h"
 
-#define MEM_VRAM 0xD40000
-volatile uint16_t* VRAM = (uint16_t*)0xD40000;
+void FillScreen(uint16_t color)
+{
+	memset(lcd_Ram, color, (320*240)<<1);
+}
 
 /* Main function, called first */
 int main(void)
@@ -13,15 +18,20 @@ int main(void)
 	/* Clear the homescreen */
 	os_ClrHome();
 
-	/* Print a string */
-	os_PutStrFull("Hello world");
+	do
+	{
+		key_update();
 
-	// Draw single red pixel at the top left
-	VRAM[0] = RGB15(31, 0, 0);
-
-	/* Waits for a key */
-	while (!os_GetCSC())
-		;
+		FillScreen(RGB15(31,31,31));
+		for(uint8_t y = 0; y < 30; y++)
+		{
+			memset(lcd_Ram+(y*LCD_WIDTH*2), RGB15(31,0,0), 60);
+			//for(uint8_t x = 0; x < 30; x++)
+			//{
+			//	plot(x, y, RGB15(31,0,0));
+			//}
+		}
+	} while (kb_Data[1] != kb_2nd);
 
 	/* Return 0 for success */
 	return 0;
