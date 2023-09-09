@@ -8,6 +8,9 @@
         "getkey.h": "c",
         "color.h": "c",
         "keypadc.h": "c",
-        "graphx.h": "c"
+        "graphx.h": "c",
+        "screen.h": "c",
+        "util.h": "c",
+        "input.h": "c"
     }
 }

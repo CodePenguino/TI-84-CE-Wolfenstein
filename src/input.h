@@ -1,17 +1,16 @@
 #pragma once
 
-#include <ti/getcsc.h>
+#include <keypadc.h>
 
-static sk_key_t __key_curr;
+static kb_key_t __key_curr;
 
-static inline bool key_pressed(const sk_key_t key)
+static inline bool key_pressed(const kb_key_t key)
 {
-	return __key_curr == key;
+	return __key_curr & key;
 }
 
 static inline void key_update()
 {
-	__key_curr = os_GetCSC();
-	// kb_Scan();
-	// __key_curr = kb_Data[7];
+	kb_Scan();
+	__key_curr = kb_AnyKey();
 }

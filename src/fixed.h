@@ -1,15 +1,8 @@
 #pragma once
 
-#include <tice.h>
-// #include <stdint.h>
-// #include <stddef.h>
-// #include <ti/real.h>
-
-// #define POINT 12
-
 typedef int24_t fixed24;
 
-#define FIX_SHIFT       12
+#define FIX_SHIFT       7 
 #define FIX_SCALE       ( 1<<FIX_SHIFT		)
 #define FIX_MASK        ( FIX_SCALE-1		)
 #define FIX_SCALEF      ( (float)FIX_SCALE	)
@@ -23,30 +16,45 @@ typedef int24_t fixed24;
 // Division approximation by reciprocal multiplication. Basically x * (1 / a)
 #define FX_RECIMUL(x, a, fp) ( ((x)*((1<<(fp))+(a)-1)/(a))>>(fp) )
 
-static inline fixed24 int2fx(int d);
-static inline fixed24 float2fx(float f);
-static inline uint24_t fx2uint(fixed24 fx);
-static inline uint24_t fx2ufrac(fixed24 fx);
-static inline int fx2int(fixed24 fx);
-static inline float fx2float(fixed24 fx);
-// static inline fixed24 fxadd(fixed24 fa, fixed24 fb);
-// static inline fixed24 fxsub(fixed24 fa, fixed24 fb);
-static inline fixed24 fxmul(fixed24 fa, fixed24 fb);
-static inline fixed24 fxdiv(fixed24 fa, fixed24 fb);
+// static inline fixed24 int2fx(int d);
+// static inline fixed24 float2fx(float f);
+// static inline uint24_t fx2uint(fixed24 fx);
+// static inline uint24_t fx2ufrac(fixed24 fx);
+// static inline int fx2int(fixed24 fx);
+// static inline float fx2float(fixed24 fx);
+// static inline fixed24 fxmul(fixed24 fa, fixed24 fb);
+// static inline fixed24 fxdiv(fixed24 fa, fixed24 fb);
 
 // Convert int to fixed24
-static inline fixed24 int2fx(int d)                 { return d << FIX_SHIFT; }
+#define int2fx(x) ({ x << FIX_SHIFT; })
 // Convert float to fixed24
-static inline fixed24 float2fx(float f)             { return (fixed24)(f * FIX_SCALEF); }
+#define float2fx(x) ({ (fixed24)(f * FIX_SCALEF); })
 // Convert fixed24 to unsigned int
-static inline uint24_t fx2uint(fixed24 fx)          { return fx >> FIX_SHIFT; }
-// Get fractional part from fixed24
-static inline uint24_t fx2ufrac(fixed24 fx)         { return fx & FIX_MASK; }
+#define fx2uint(x) ({ fx >> FIX_SHIFT; })
+// Get fractional bit from fixed24
+#define fx2ufrac(x) ({ x & FIX_MASK; })
 // Convert fixed24 to int
-static inline int fx2int(fixed24 fx)                { return fx / FIX_SCALE; }
+#define fx2int(x) ({ x / FIX_SCALE; })
 // Convert fixed24 to float
-static inline float fx2float(fixed24 fx)            { return fx / FIX_SCALEF; }
+#define fx2float(x) ({ x / FIX_SCALEF; })
 // Multiply two fixed24 numbers
-static inline fixed24 fxmul(fixed24 fa, fixed24 fb) { return (fa * fb) >> FIX_SHIFT; }
+#define fxmul(a, b) ({ (a * b) >> FIX_SHIFT; })
 // Divide two fixed24 numbers
-static inline fixed24 fxdiv(fixed24 fa, fixed24 fb) { return ((fa) * FIX_SCALE) / (fb); }
+#define fxdiv(a, b) ({ ((a) * FIX_SCALE) / (b); })
+
+// Convert int to fixed24
+// static inline fixed24 int2fx(int d)                 { return d << FIX_SHIFT; }
+// Convert float to fixed24
+// static inline fixed24 float2fx(float f)             { return (fixed24)(f * FIX_SCALEF); }
+// Convert fixed24 to unsigned int
+// static inline uint24_t fx2uint(fixed24 fx)          { return fx >> FIX_SHIFT; }
+// Get fractional bit from fixed24
+// static inline uint24_t fx2ufrac(fixed24 fx)         { return fx & FIX_MASK; }
+// Convert fixed24 to int
+// static inline int fx2int(fixed24 fx)                { return fx / FIX_SCALE; }
+// Convert fixed24 to float
+// static inline float fx2float(fixed24 fx)            { return fx / FIX_SCALEF; }
+// Multiply two fixed24 numbers
+// static inline fixed24 fxmul(fixed24 fa, fixed24 fb) { return (fa * fb) >> FIX_SHIFT; }
+// Divide two fixed24 numbers
+// static inline fixed24 fxdiv(fixed24 fa, fixed24 fb) { return ((fa) * FIX_SCALE) / (fb); }

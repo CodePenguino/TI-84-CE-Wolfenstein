@@ -1,11 +1,13 @@
-NAME ?= WOLF3D
-ICON ?= icon.png
-DESCRIPTION ?= "Woflenstein raycaster for the Ti84 CE by Rodrigo Agras"
-COMPRESSED ?= NO
-ARCHIVED ?= NO
+NAME = WOLF3D
+ICON = icon.png
+DESCRIPTION = "Woflenstein raycaster for the Ti84 Plus CE by Rodrigo Agras"
+COMPRESSED = NO
+ARCHIVED = NO
 
-CFLAGS ?= -Wall -Wextra -Oz
-CXXFLAGS ?= -Wall -Wextra -Oz
+CFLAGS = -Wall -Wextra -Oz
+CXXFLAGS = -Wall -Wextra -Oz
+
+V = 0
 
 # ----------------------------
 

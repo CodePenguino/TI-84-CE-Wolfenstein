@@ -1,49 +1,54 @@
 #include <ti/screen.h>
 #include <graphx.h>
-#include "color.h"
 #include "input.h"
-#include <string.h>
-#include "util.h"
+#include "fixed.h"
+#include "math.h"
 
-/*void FillScreen(uint16_t color)
-{
-	memset(lcd_Ram, color, (320*240)<<1);
-}*/
-
-/* Main function, called first */
 int main(void)
 {
-	/* Clear the homescreen */
+	// Clear homescreen and set up gfx api
 	os_ClrHome();
 	gfx_Begin();
 	gfx_SetDrawScreen();
 
+	// Set up basic color palette
 	gfx_palette[0] = gfx_RGBTo1555(255, 255, 255);
 	gfx_palette[1] = gfx_RGBTo1555(255, 0, 0);
+	gfx_palette[2] = gfx_RGBTo1555(0, 0, 255);
 
-	uint8_t x = 0, y = 0;
+	//fixed24 x = 0, y = 0;
+	fixed24 time = 0;
+	uint8_t sine = 0;
 
-	// TODO: Change key update to be per frame, not whatever it is right now...
-	// TODO: Add page flipping
 	do
 	{
 		key_update();
 		gfx_ZeroScreen();
 		
-		if(key_pressed(sk_Right))
-			x += 4;
-		if(key_pressed(sk_Left))
-			x -= 4;
-		if(key_pressed(sk_Up))
-			y += 4;
-		if(key_pressed(sk_Down))
-			y -= 4;
+		/*if(key_pressed(kb_Right))
+			x += FIX_ONE;
+		if(key_pressed(kb_Left))
+			x -= FIX_ONE;
+		if(key_pressed(kb_Down))
+			y += FIX_ONE;
+		if(key_pressed(kb_Up))
+			y -= FIX_ONE;*/
 
 		gfx_SetColor(1);
-		gfx_FillRectangle(0+x, 0+y, 20, 20);
-	} while (!key_pressed(sk_2nd));
-	gfx_End();
+		//gfx_FillRectangle(fx2int(fxmul(x, 1536)), fx2int(fxmul(y, 1536)), 12, 12);
 
-	/* Return 0 for success */
+		gfx_SetTextFGColor(2);
+		gfx_SetTextXY(0, 0);
+		gfx_PrintInt(lu_sin(sine), 8);
+		gfx_SetTextXY(0, 8);
+		gfx_PrintInt(sine, 8);
+		sine++;
+
+		gfx_SwapDraw();
+		time += FIX_ONE;
+	} while (!key_pressed(kb_2nd));
+	
+	// Clear memory and gfx api (otherwise you get glitched graphics)
+	gfx_End();
 	return 0;
 }
