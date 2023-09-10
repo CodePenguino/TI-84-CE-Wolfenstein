@@ -17,14 +17,13 @@ int main(void)
 	gfx_palette[2] = gfx_RGBTo1555(0, 0, 255);
 
 	//fixed24 x = 0, y = 0;
-	fixed24 time = 0;
-	uint8_t sine = 0;
+	uint24_t timer = 0;
 
 	do
 	{
 		key_update();
 		gfx_ZeroScreen();
-		
+
 		/*if(key_pressed(kb_Right))
 			x += FIX_ONE;
 		if(key_pressed(kb_Left))
@@ -35,20 +34,17 @@ int main(void)
 			y -= FIX_ONE;*/
 
 		gfx_SetColor(1);
-		//gfx_FillRectangle(fx2int(fxmul(x, 1536)), fx2int(fxmul(y, 1536)), 12, 12);
+		gfx_FillRectangle((lu_cos(timer)>>1) + 148, (lu_sin(timer)>>1) + 108, 12, 12);
 
 		gfx_SetTextFGColor(2);
-		gfx_SetTextXY(0, 0);
-		gfx_PrintInt(lu_sin(sine), 8);
 		gfx_SetTextXY(0, 8);
-		gfx_PrintInt(sine, 8);
-		sine++;
+		gfx_PrintInt(timer, 8);
+		timer++;
 
 		gfx_SwapDraw();
-		time += FIX_ONE;
 	} while (!key_pressed(kb_2nd));
-	
-	// Clear memory and gfx api (otherwise you get glitched graphics)
+
+	// Clear memory and gfx api (otherwise you get corrupted graphics)
 	gfx_End();
 	return 0;
 }
