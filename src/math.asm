@@ -4,22 +4,22 @@
 	public __getSinCos
 __getSinCos:
 	; returns a = sin/cos(a) * 128
-	ld	c,a
-	bit	7,a
-	jr	z,$+4
-	sub	a,128
-	bit	6,a
-	jr	z,$+6
-	ld	e,a
-	ld	a,128
-	sub	a,e
-	ld	de,0
-	ld	e,a
-	ld	hl,_SineTable
-	add	hl,de
-	ld	a,(hl)
-	bit	7,c
-	ret	z
+	ld  c,a
+	bit 7,a
+	jr  z,$+4
+	sub a,128
+	bit 6,a
+	jr  z,$+6
+	ld  e,a
+	ld  a,128
+	sub a,e
+	ld  de,0
+	ld  e,a
+	ld  hl,_SineTable
+	add hl,de
+	ld  a,(hl)
+	bit 7,c
+	ret z
 	neg
 	ret
 

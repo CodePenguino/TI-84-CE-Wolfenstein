@@ -28,9 +28,9 @@ typedef int24_t fixed24;
 // Convert int to fixed24
 #define int2fx(x) ({ x << FIX_SHIFT; })
 // Convert float to fixed24
-#define float2fx(x) ({ (fixed24)(f * FIX_SCALEF); })
+#define float2fx(x) ({ (fixed24)(x * FIX_SCALEF); })
 // Convert fixed24 to unsigned int
-#define fx2uint(x) ({ fx >> FIX_SHIFT; })
+#define fx2uint(x) ({ x >> FIX_SHIFT; })
 // Get fractional bit from fixed24
 #define fx2ufrac(x) ({ x & FIX_MASK; })
 // Convert fixed24 to int

@@ -3,6 +3,10 @@
 #include "input.h"
 #include "fixed.h"
 #include "math.h"
+#include "util.h"
+
+#define gfx_vbuffer16 \
+(**(uint16_t(**)[240][320])0xE30014)
 
 int main(void)
 {
@@ -16,7 +20,9 @@ int main(void)
 	gfx_palette[1] = gfx_RGBTo1555(255, 0, 0);
 	gfx_palette[2] = gfx_RGBTo1555(0, 0, 255);
 
-	//fixed24 x = 0, y = 0;
+	gfx_SetTextScale(2, 2);
+
+	fixed24 x = 0, y = 0;
 	uint24_t timer = 0;
 
 	do
@@ -25,21 +31,27 @@ int main(void)
 		gfx_ZeroScreen();
 
 		/*if(key_pressed(kb_Right))
-			x += FIX_ONE;
+			x += 64;
 		if(key_pressed(kb_Left))
-			x -= FIX_ONE;
+			x -= 64;
 		if(key_pressed(kb_Down))
-			y += FIX_ONE;
+			y += 64;
 		if(key_pressed(kb_Up))
-			y -= FIX_ONE;*/
+			y -= 64;*/
 
+		// gfx_SetColor16(dup8(1));
 		gfx_SetColor(1);
+		//gfx_SetPixel(1, 1);
+		//gfx_vbuffer16[fx2uint(y)][fx2uint(x)] = (1);
+		//gfx_VertLine(20, 20, 20);
 		gfx_FillRectangle((lu_cos(timer)>>1) + 148, (lu_sin(timer)>>1) + 108, 12, 12);
 
-		gfx_SetTextFGColor(2);
-		gfx_SetTextXY(0, 8);
-		gfx_PrintInt(timer, 8);
+		//gfx_SetTextFGColor(2);
+		//gfx_SetTextXY(0, 0);
+		//gfx_PrintInt(timer >> 8, 8);
 		timer++;
+
+
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
