@@ -5,9 +5,6 @@
 #include "math.h"
 #include "util.h"
 
-#define gfx_vbuffer16 \
-(**(uint16_t(**)[240][320])0xE30014)
-
 int main(void)
 {
 	// Clear homescreen and set up gfx api
@@ -30,22 +27,33 @@ int main(void)
 		key_update();
 		gfx_ZeroScreen();
 
-		/*if(key_pressed(kb_Right))
-			x += 64;
+		if(key_pressed(kb_Right))
+			x += 1;
 		if(key_pressed(kb_Left))
-			x -= 64;
+			x -= 1;
 		if(key_pressed(kb_Down))
-			y += 64;
+			y += 1;
 		if(key_pressed(kb_Up))
-			y -= 64;*/
+			y -= 1;
 
 		// gfx_SetColor16(dup8(1));
-		gfx_SetColor(1);
+		//gfx_SetColor(1);
 		//gfx_SetPixel(1, 1);
-		//gfx_vbuffer16[fx2uint(y)][fx2uint(x)] = (1);
 		//gfx_VertLine(20, 20, 20);
+
+		gfx_SetPixel2(x, y, 2);
+
+		//for(uint8_t i = 0; i < 30; i++)
+			//gfx_vbuffer16[fx2uint(y)+i][fx2uint(x)] = 0x0001;
+
+		gfx_SetColor(1);
 		gfx_FillRectangle((lu_cos(timer)>>1) + 148, (lu_sin(timer)>>1) + 108, 12, 12);
 
+		gfx_SetTextFGColor(1);
+		gfx_SetTextXY(0, 0);
+		gfx_PrintInt(x, 8);
+		gfx_SetTextXY(0, 16);
+		gfx_PrintInt(y, 8);
 		//gfx_SetTextFGColor(2);
 		//gfx_SetTextXY(0, 0);
 		//gfx_PrintInt(timer >> 8, 8);

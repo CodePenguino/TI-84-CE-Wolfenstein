@@ -3,6 +3,7 @@
   section .text
 	public __getSinCos
 __getSinCos:
+	; NOTE: My eyes are bloodshot
 	; returns a = sin/cos(a) * 128
 	ld  c,a
 	bit 7,a

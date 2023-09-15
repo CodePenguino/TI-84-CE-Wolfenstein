@@ -7,8 +7,6 @@ ARCHIVED = NO
 CFLAGS = -Wall -Wextra -Oz
 CXXFLAGS = -Wall -Wextra -Oz
 
-V = 0
-
 # ----------------------------
 
 ifndef CEDEV
