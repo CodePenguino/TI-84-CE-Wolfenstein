@@ -13,13 +13,14 @@ int main(void)
 	gfx_SetDrawScreen();
 
 	// Set up basic color palette
-	gfx_palette[0] = gfx_RGBTo1555(255, 255, 255);
-	gfx_palette[1] = gfx_RGBTo1555(255, 0, 0);
-	gfx_palette[2] = gfx_RGBTo1555(0, 0, 255);
+	//gfx_palette[0] = gfx_RGBTo1555(255, 255, 255);
+	//gfx_palette[1] = gfx_RGBTo1555(255, 0, 0);
+	//gfx_palette[2] = gfx_RGBTo1555(0, 0, 255);
+	gfx_SetDefaultPalette(gfx_8bpp);
 
 	gfx_SetTextScale(2, 2);
 
-	fixed24 x = 0, y = 0;
+	fixed24 x = 2, y = 15;
 	uint24_t timer = 0;
 
 	do
@@ -41,25 +42,37 @@ int main(void)
 		//gfx_SetPixel(1, 1);
 		//gfx_VertLine(20, 20, 20);
 
-		gfx_SetPixel2(x, y, 2);
+		//gfx_SetPixel2(x, y, 2);
+		//gfx_SetColor(timer>>1);
+		//gfx_Rectangle_NoClip(20, 20, 2, 20);
 
-		//for(uint8_t i = 0; i < 30; i++)
-			//gfx_vbuffer16[fx2uint(y)+i][fx2uint(x)] = 0x0001;
+		gfx_SetColor(timer>>1);
 
-		gfx_SetColor(1);
-		gfx_FillRectangle((lu_cos(timer)>>1) + 148, (lu_sin(timer)>>1) + 108, 12, 12);
+		uint8_t var = 0;
 
-		gfx_SetTextFGColor(1);
+		gfx_SetPixel2(1, 1, 257);
+		asm("ld %0, iy" : "=r" (var));
+		
+		gfx_SetTextFGColor(2);
 		gfx_SetTextXY(0, 0);
-		gfx_PrintInt(x, 8);
-		gfx_SetTextXY(0, 16);
-		gfx_PrintInt(y, 8);
+		gfx_PrintInt(var, 8);
+
+		/*for(uint16_t i = 0; i < 160; i++)
+		{
+			uint8_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
+			// gfx_VertLine2_NoClip(i, sine_length, (120-sine_length)<<1);
+			gfx_Rectangle_NoClip(i<<1, sine_length, 2, (120-sine_length)<<1);
+			// gfx_VertLine_NoClip(i, sine_length, (120-sine_length)<<1);
+			//gfx_VertLine(i, sine_length, (120-sine_length)<<1);
+		}*/
+
+		//gfx_SetColor(1);
+		//gfx_FillRectangle((lu_cos(timer)>>1) + 148, (lu_sin(timer)>>1) + 108, 12, 12);
+
 		//gfx_SetTextFGColor(2);
 		//gfx_SetTextXY(0, 0);
 		//gfx_PrintInt(timer >> 8, 8);
 		timer++;
-
-
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));

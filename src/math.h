@@ -1,6 +1,6 @@
 #pragma once
 
-// Duplicate u8 to form a u16; 0x12 -> 0x1212
+// Duplicate u8 to form a u16; (ex.) 0x12 -> 0x1212
 inline uint16_t dup8(uint8_t x) { return x | (x<<8); }
 
 #ifdef __cplusplus
