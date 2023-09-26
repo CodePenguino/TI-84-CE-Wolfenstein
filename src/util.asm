@@ -92,39 +92,69 @@ macro smcByte name*, addr: $-1
 	name equ link
 end macro
 
+; YOLO!!!
+macro vertLoop i*
+	repeat i
+		_DrawVert#%:
+			repeat %
+				ld  (hl),bc
+				add hl,de
+			end repeat
+			ret
+	end repeat
+end macro
+
+; --------------------------------------------------------------------------------------------
   section .text
 
-; --------------------------------------------------------------------------------------------
+; Set up all 200 vertical line drawing functions
+	vertLoop 200
 
-	public __gfx_SetPixel2_NoClip
-__gfx_SetPixel2_NoClip:
-; Sets the color pixel to the global color index
-; Arguments:
-;  arg0 : X coordinate
-;  arg1 : Y coordinate
-; Returns:
-;  None
-	ld	hl,3
-	add	hl,sp
-	ld	bc,(hl)			; bc = x coordinate
-	ld	de,3
-	add	hl,de			; move to next argument
-	ld	e,(hl)			; e = y coordinate
-	add hl,de
-	ld iy, (hl)     ; iy = color
-;_SetPixel_NoClip_NoWait:
-	ld	hl,(CurrentBuffer)
-	add	hl,bc
-	ld	d,ti.lcdWidth / 2
-	mlt	de
-	add	hl,de
-	add	hl,de
-	; ---- jank ----
-	;ld iy, 257
-	; ---- jank ----
+	public _gfx_SetPixel2_NoClip
+_gfx_SetPixel2_NoClip:
+	; Set up iy register
+	ld  iy, 0
+	add iy,sp
 
-	ld	(hl),iy			; get the actual pixel
-;smcByte _Color
+	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
+	ld  bc,(iy+3)          ; bc = x
+	add hl,bc              ; hl += bc
+	ld  c,(iy+6)           ; c = y
+	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
+	mlt bc                 ; bc = b * c (y * 160)
+	add hl,bc
+	add hl,bc
+	ld  de,(iy+9)          ; de = c
+	ld	(hl),de            ; set the pixel color
 	ret
 
-; --------------------------------------------------------------------------------------------
+	public _gfx_VertLine2_NoClip
+_gfx_VertLine2_NoClip:
+	; Set up iy register
+	ld  iy, 0
+	add iy,sp
+
+	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
+	ld  bc,(iy+3)          ; bc = x
+	add hl,bc              ; hl += bc
+	ld  c,(iy+6)           ; c = y
+	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
+	mlt bc                 ; bc = b * c = y * 160
+	add hl,bc
+	add hl,bc
+	
+	ld  de,ti.lcdWidth
+	ld  bc,(iy+12)         ; bc = c
+
+	ld  iy,(iy+9)          ; iy = length
+
+	; TODO: Replace this 200 with an actual number
+
+	call _DrawVert1 + $000000
+	;call _DrawVert1
+
+; .loop:
+; 	ld  (hl),iy
+; 	add hl,de
+; 	djnz .loop
+	ret

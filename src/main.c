@@ -37,34 +37,18 @@ int main(void)
 		if(key_pressed(kb_Up))
 			y -= 1;
 
-		// gfx_SetColor16(dup8(1));
-		//gfx_SetColor(1);
-		//gfx_SetPixel(1, 1);
-		//gfx_VertLine(20, 20, 20);
-
-		//gfx_SetPixel2(x, y, 2);
-		//gfx_SetColor(timer>>1);
-		//gfx_Rectangle_NoClip(20, 20, 2, 20);
-
 		gfx_SetColor(timer>>1);
+		//gfx_SetPixel2_NoClip(x, y, dup8(timer>>1));
+		//gfx_VertLine2_NoClip(x, y, 15, dup8(timer>>1));
 
-		uint8_t var = 0;
-
-		gfx_SetPixel2(1, 1, 257);
-		asm("ld %0, iy" : "=r" (var));
-		
-		gfx_SetTextFGColor(2);
-		gfx_SetTextXY(0, 0);
-		gfx_PrintInt(var, 8);
-
-		/*for(uint16_t i = 0; i < 160; i++)
+		for(uint16_t i = 0; i < 320; i+=2)
 		{
 			uint8_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
-			// gfx_VertLine2_NoClip(i, sine_length, (120-sine_length)<<1);
-			gfx_Rectangle_NoClip(i<<1, sine_length, 2, (120-sine_length)<<1);
+			__gfx_VertLine2_NoClip(i, sine_length, (120-sine_length)<<1, dup8(i-(timer>>1)));
+			//gfx_Rectangle_NoClip(i, sine_length, 2, (120-sine_length)<<1);
 			// gfx_VertLine_NoClip(i, sine_length, (120-sine_length)<<1);
-			//gfx_VertLine(i, sine_length, (120-sine_length)<<1);
-		}*/
+			// gfx_VertLine(i, sine_length, (120-sine_length)<<1);
+		}
 
 		//gfx_SetColor(1);
 		//gfx_FillRectangle((lu_cos(timer)>>1) + 148, (lu_sin(timer)>>1) + 108, 12, 12);
