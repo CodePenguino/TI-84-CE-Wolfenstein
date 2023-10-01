@@ -92,23 +92,8 @@ macro smcByte name*, addr: $-1
 	name equ link
 end macro
 
-; YOLO!!!
-macro vertLoop i*
-	repeat i
-		_DrawVert#%:
-			repeat %
-				ld  (hl),bc
-				add hl,de
-			end repeat
-			ret
-	end repeat
-end macro
-
 ; --------------------------------------------------------------------------------------------
   section .text
-
-; Set up all 200 vertical line drawing functions
-	vertLoop 200
 
 	public _gfx_SetPixel2_NoClip
 _gfx_SetPixel2_NoClip:
@@ -143,15 +128,20 @@ _gfx_VertLine2_NoClip:
 	add hl,bc
 	add hl,bc
 	
-	ld  de,ti.lcdWidth
+	ld  de,(iy+9)          ; de = length
 	ld  bc,(iy+12)         ; bc = c
+	ld  iy,draw            ; iy = memory address of draw function
+	add iy,de              ; offset pointer by the line length so it points to the right memory address
 
-	ld  iy,(iy+9)          ; iy = length
+	ld  de,ti.lcdWidth
 
-	; TODO: Replace this 200 with an actual number
+	jp (iy)                ; jump to correct memory address for drawing line length
 
-	call _DrawVert1 + $000000
-	;call _DrawVert1
+draw:
+repeat 200
+	ld  (hl),bc
+	add hl,de
+end repeat
 
 ; .loop:
 ; 	ld  (hl),iy

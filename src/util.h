@@ -30,12 +30,13 @@ extern void gfx_SetPixel2_NoClip(uint24_t x, uint8_t y, uint24_t c);
 * @param[in] length length of the line
 * @param[in] c Color
 */
-extern void gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint8_t length, uint24_t c);
+extern void gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint16_t length, uint24_t c);
 #ifdef __cplusplus
 }
 #endif
 
-void __gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint8_t length, uint24_t c)
+static inline void __gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint8_t length, uint24_t c)
 {
-	gfx_VertLine2_NoClip(x, y, (3*(length*length) + 5*length)>>1, c);
+	if(length > 200) return;
+	gfx_VertLine2_NoClip(x, y, 600 - (3*length), c);
 }

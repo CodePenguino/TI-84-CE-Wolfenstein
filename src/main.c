@@ -5,6 +5,10 @@
 #include "math.h"
 #include "util.h"
 
+#define min(_a, _b) ({ __typeof__(_a) __a = (_a), __b = (_b); __a < __b ? __a : __b; })
+#define max(_a, _b) ({ __typeof__(_a) __a = (_a), __b = (_b); __a > __b ? __a : __b; })
+#define clamp(_x, _mi, _ma) (min(max(_x, _mi), _ma))
+
 int main(void)
 {
 	// Clear homescreen and set up gfx api
@@ -44,21 +48,17 @@ int main(void)
 		for(uint16_t i = 0; i < 320; i+=2)
 		{
 			uint8_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
-			__gfx_VertLine2_NoClip(i, sine_length, (120-sine_length)<<1, dup8(i-(timer>>1)));
-			//gfx_Rectangle_NoClip(i, sine_length, 2, (120-sine_length)<<1);
+
+			__gfx_VertLine2_NoClip(i, sine_length, (120-sine_length)<<1, dup8(i-(timer)));
+			// gfx_Rectangle_NoClip(i, sine_length, 2, (120-sine_length)<<1);
 			// gfx_VertLine_NoClip(i, sine_length, (120-sine_length)<<1);
 			// gfx_VertLine(i, sine_length, (120-sine_length)<<1);
 		}
 
-		//gfx_SetColor(1);
-		//gfx_FillRectangle((lu_cos(timer)>>1) + 148, (lu_sin(timer)>>1) + 108, 12, 12);
-
-		//gfx_SetTextFGColor(2);
-		//gfx_SetTextXY(0, 0);
-		//gfx_PrintInt(timer >> 8, 8);
 		timer++;
 
 		gfx_SwapDraw();
+		gfx_Wait();
 	} while (!key_pressed(kb_2nd));
 
 	// Clear memory and gfx api (otherwise you get corrupted graphics)
