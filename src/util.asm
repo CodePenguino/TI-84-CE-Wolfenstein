@@ -113,8 +113,8 @@ _gfx_SetPixel2_NoClip:
 	ld	(hl),de            ; set the pixel color
 	ret
 
-	public _gfx_VertLine2_NoClip
-_gfx_VertLine2_NoClip:
+	public __gfx_VertLine2_NoClip
+__gfx_VertLine2_NoClip:
 	; Set up iy register
 	ld  iy, 0
 	add iy,sp
@@ -127,18 +127,18 @@ _gfx_VertLine2_NoClip:
 	mlt bc                 ; bc = b * c = y * 160
 	add hl,bc
 	add hl,bc
-	
+
 	ld  de,(iy+9)          ; de = length
 	ld  bc,(iy+12)         ; bc = c
-	ld  iy,draw            ; iy = memory address of draw function
+	ld  iy,drawVert        ; iy = memory address of draw function
 	add iy,de              ; offset pointer by the line length so it points to the right memory address
 
 	ld  de,ti.lcdWidth
 
 	jp (iy)                ; jump to correct memory address for drawing line length
 
-draw:
-repeat 200
+drawVert:
+repeat 200               ; YOLO!!!!!!!!!!!!!
 	ld  (hl),bc
 	add hl,de
 end repeat
@@ -148,3 +148,67 @@ end repeat
 ; 	add hl,de
 ; 	djnz .loop
 	ret
+
+public __gfx_TexturedVertLine2_NoClip
+__gfx_TexturedVertLine2_NoClip:
+	; Set up iy register
+	ld  iy, 0
+	add iy,sp
+
+	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
+	ld  bc,(iy+3)          ; bc = x
+	add hl,bc              ; hl += bc
+	ld  c,(iy+6)           ; c = y
+	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
+	mlt bc                 ; bc = b * c = y * 160
+	add hl,bc
+	add hl,bc
+
+	ld  b,(iy+9)           ; b = length
+	ld  de, ti.lcdWidth    ; de = screen width
+
+	exx
+	ld  hl,(iy+12)         ; bc' = texture pointer
+	ld  a,(bc)
+	ld  de,1
+	exx
+
+repeat 200
+	exx                    ; 1 cycle
+	ld  a,(hl)             ; 2 cycles
+	add hl,de              ; 1 cycle
+	exx                    ; 1 cycle
+
+	ld  (hl),a             ; 2 cycle
+	add hl,de              ; 1 cycle
+	; djnz .loop             ; 2/4 cycles (OUCH!!!)
+end repeat
+
+; .loop:
+; 	exx                    ; 1 cycle
+; 	ld  a,(hl)             ; 2 cycles
+; 	add hl,de              ; 1 cycle
+; 	exx                    ; 1 cycle
+
+; 	ld  (hl),a             ; 2 cycle
+; 	add hl,de              ; 1 cycle
+; 	djnz .loop             ; 2/4 cycles (OUCH!!!)
+
+; 	ret
+
+
+
+; 	ld  de,(iy+9)          ; de = length
+; 	ld  bc,(iy+12)         ; bc = c
+; 	ld  iy,drawVertTxt     ; iy = memory address of draw function
+; 	add iy,de              ; offset pointer by the line length so it points to the right memory address
+
+; 	ld  de,ti.lcdWidth
+
+; 	jp (iy)                ; jump to correct memory address for drawing line length
+
+; drawVertTxt:
+; repeat 200               ; YOLO!!!!!!!!!!!!!
+; 	ld  (hl),bc
+; 	add hl,de
+; end repeat

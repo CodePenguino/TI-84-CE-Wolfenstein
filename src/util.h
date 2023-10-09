@@ -1,15 +1,5 @@
 #pragma once
 
-/*asm ("\n\t"
-"	repeat 200\n\t"
-"		_DrawVert#%:\n\t"
-"			repeat %\n\t"
-"				ld  (hl),bc\n\t"
-"				add hl,de\n\t"
-"			end repeat\n\t"
-"			ret\n\t"
-"	end repeat");*/
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -30,13 +20,17 @@ extern void gfx_SetPixel2_NoClip(uint24_t x, uint8_t y, uint24_t c);
 * @param[in] length length of the line
 * @param[in] c Color
 */
-extern void gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint16_t length, uint24_t c);
+extern void _gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint16_t length, uint24_t c);
+//extern void draw_column_tall(uint8_t *column, uint8_t *texture, uint24_t texture_delta, uint8_t texture_fraction);
+
+extern void _gfx_TexturedVertLine2_NoClip(uint24_t x, uint8_t y, uint16_t length, uint8_t* texture);
+
 #ifdef __cplusplus
 }
 #endif
 
-static inline void __gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint8_t length, uint24_t c)
+static inline void gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint8_t length, uint24_t c)
 {
 	if(length > 200) return;
-	gfx_VertLine2_NoClip(x, y, 600 - (3*length), c);
+	_gfx_VertLine2_NoClip(x, y, 600 - (3*length), c);
 }
