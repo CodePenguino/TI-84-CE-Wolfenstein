@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -23,7 +25,7 @@ extern void gfx_SetPixel2_NoClip(uint24_t x, uint8_t y, uint24_t c);
 extern void _gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint16_t length, uint24_t c);
 //extern void draw_column_tall(uint8_t *column, uint8_t *texture, uint24_t texture_delta, uint8_t texture_fraction);
 
-extern void _gfx_TexturedVertLine2_NoClip(uint24_t x, uint8_t y, uint16_t length, uint8_t* texture);
+extern void _gfx_TexturedVertLine2_NoClip(uint24_t x, uint8_t y, uint16_t length, uint24_t* texture);
 
 #ifdef __cplusplus
 }

@@ -1,0 +1,8 @@
+-I
+C:/CEdev/include
+-L
+C:/CEdev/lib
+
+# My eyes...
+-D __INT24_TYPE__=__INT16_TYPE__
+-D __UINT24_TYPE__=__UINT16_TYPE__
