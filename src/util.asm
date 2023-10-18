@@ -170,23 +170,38 @@ __gfx_TexturedVertLine2_NoClip:
 	add hl,bc
 	add hl,bc
 
-	ld  b,(iy+9)           ; b = length
+	;ld  a,(iy+15)           ; a = delta
 	ld  de,ti.lcdWidth     ; de = screen width
 
-  ld  iy,(iy+12)         ; iy = texture pointer
+  exx
+  ld  hl,(iy+12)         ; hl' = texture pointer
+  ld  bc,(iy+15)         ; bc' = delta
+  ld  de,0               ; de' = 0
+  exx
+
+  ;ld  iy,(iy+12)         ; iy = texture pointer
+  
+
   ;ld  bc,(iy)
-  ;ld  bc,1
 
   ;jp _DrawVert
-  jp $+400
+  ;jp $+400
 repeat 160
-  ;jp _DrawVert160
-  ld  bc,(iy+((%/((160/16)+1))*3))
+  ;ld  bc,(iy+((%/((160/16)))*3))
+  exx
+  ld e, b
 
-  ld (hl),bc
+  add hl,de
+  ld  iy, (hl)
+  ;ld  l, c
+  exx
+
+
+  ;add iy,a
+
+  ld (hl),iy
   add hl,de
 end repeat
 
   ret
-
-texLoop 160
+;texLoop 160

@@ -61,7 +61,7 @@ int main(void)
       uint8_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
 
       // draw_column_tall((uint8_t*)0xd40000, );
-      _gfx_TexturedVertLine2_NoClip(i, sine_length, 200, texture);
+      _gfx_TexturedVertLine2_NoClip(i, sine_length, 160, texture, timer);
 			// gfx_VertLine2_NoClip(i, sine_length, (120-sine_length)<<1, dup8(i));
 		}
 
