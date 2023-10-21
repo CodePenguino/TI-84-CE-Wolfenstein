@@ -139,7 +139,7 @@ __gfx_VertLine2_NoClip:
 	jp (iy)                ; jump to correct memory address for drawing line length
 
 drawVert:
-repeat 200               ; YOLO!!!!!!!!!!!!!
+repeat 200               ; Kids, don't try this at home...
 	ld  (hl),bc
 	add hl,de
 end repeat
@@ -170,32 +170,41 @@ __gfx_TexturedVertLine2_NoClip:
 	add hl,bc
 	add hl,bc
 
-	;ld  a,(iy+15)           ; a = delta
+	;ld  a,(iy+15)         ; a = delta
 	ld  de,ti.lcdWidth     ; de = screen width
 
   exx
-  ld  hl,(iy+12)         ; hl' = texture pointer
+  ;ld  de,(iy+12)         ; de' = texture pointer
+  ;ld  h,e                ; 
+  ;ld  l,(iy+18)          ; hl' = texture position counter
+  ;ld  bc,(iy+15)         ; bc' = delta
+  ld  de,(iy+12)         ; de' = texture pointer
   ld  bc,(iy+15)         ; bc' = delta
-  ld  de,0               ; de' = 0
+  ld  h,e
+  
+  ld  l,e          ; TODO: Fix this lmao
   exx
 
-  ;ld  iy,(iy+12)         ; iy = texture pointer
+  ;ld  iy,(iy+12)        ; iy = texture pointer
   
 
   ;ld  bc,(iy)
 
   ;jp _DrawVert
   ;jp $+400
-repeat 160
+repeat 160               ; Kids, SERIOUSLY don't try this at home...
   ;ld  bc,(iy+((%/((160/16)))*3))
   exx
-  ld e, b
-
-  add hl,de
-  ld  iy, (hl)
-  ;ld  l, c
+  add hl,bc
+  ld  e,h
+  ex de,hl
+  ld  iy,(hl)
+  ex hl,de
+ ;ld e, b                ; e = int part
+  ;ld a, c                ; a = decimal part
+  ;add hl,de
+  ;ld  iy, (hl)
   exx
-
 
   ;add iy,a
 
@@ -204,4 +213,3 @@ repeat 160
 end repeat
 
   ret
-;texLoop 160
