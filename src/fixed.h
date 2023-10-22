@@ -16,14 +16,7 @@ typedef int24_t fixed24;
 // Division approximation by reciprocal multiplication. Basically x * (1 / a)
 #define FX_RECIMUL(x, a, fp) ( ((x)*((1<<(fp))+(a)-1)/(a))>>(fp) )
 
-// static inline fixed24 int2fx(int d);
-// static inline fixed24 float2fx(float f);
-// static inline uint24_t fx2uint(fixed24 fx);
-// static inline uint24_t fx2ufrac(fixed24 fx);
-// static inline int fx2int(fixed24 fx);
-// static inline float fx2float(fixed24 fx);
-// static inline fixed24 fxmul(fixed24 fa, fixed24 fb);
-// static inline fixed24 fxdiv(fixed24 fa, fixed24 fb);
+// TODO: Maybe change to assembly instructions? ¯\_(ツ)_/¯
 
 // Convert int to fixed24
 #define int2fx(x) (fixed24)(x << FIX_SHIFT)
@@ -41,20 +34,3 @@ typedef int24_t fixed24;
 #define fxmul(a, b) (fixed24)((a * b) >> FIX_SHIFT)
 // Divide two fixed24 numbers
 #define fxdiv(a, b) (fixed24)(((a) * FIX_SCALE) / (b))
-
-// Convert int to fixed24
-// static inline fixed24 int2fx(int d)                 { return d << FIX_SHIFT; }
-// Convert float to fixed24
-// static inline fixed24 float2fx(float f)             { return (fixed24)(f * FIX_SCALEF); }
-// Convert fixed24 to unsigned int
-// static inline uint24_t fx2uint(fixed24 fx)          { return fx >> FIX_SHIFT; }
-// Get fractional bit from fixed24
-// static inline uint24_t fx2ufrac(fixed24 fx)         { return fx & FIX_MASK; }
-// Convert fixed24 to int
-// static inline int fx2int(fixed24 fx)                { return fx / FIX_SCALE; }
-// Convert fixed24 to float
-// static inline float fx2float(fixed24 fx)            { return fx / FIX_SCALEF; }
-// Multiply two fixed24 numbers
-// static inline fixed24 fxmul(fixed24 fa, fixed24 fb) { return (fa * fb) >> FIX_SHIFT; }
-// Divide two fixed24 numbers
-// static inline fixed24 fxdiv(fixed24 fa, fixed24 fb) { return ((fa) * FIX_SCALE) / (fb); }

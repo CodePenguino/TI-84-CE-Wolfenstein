@@ -1,4 +1,4 @@
-  assume adl=1
+assume adl=1
 	include 'ti84pceg.inc'
 
 LcdSize            := ti.lcdWidth*ti.lcdHeight
@@ -20,7 +20,7 @@ macro mIsHLLessThanBC?
 end macro
 macro s8 op, imm
 	local i
- 	i = imm
+	i = imm
 	assert i >= -128 & i < 128
 	op, i
 end macro
@@ -93,7 +93,7 @@ macro smcByte name*, addr: $-1
 end macro
 
 ; --------------------------------------------------------------------------------------------
-  section .text
+	section .text
 
 	public _gfx_SetPixel2_NoClip
 _gfx_SetPixel2_NoClip:
@@ -145,18 +145,8 @@ repeat 200               ; Kids, don't try this at home...
 end repeat
 	ret
 
-
-macro texLoop i*
-  repeat i
-    _DrawVert#%:
-      ;ld  bc,(iy+((%/((i/16)+1))*3))
-      ld  bc,(iy+((%/((i/16)+1))*3))
-      ret
-  end repeat
-end macro
-
-public __gfx_TexturedVertLine2_NoClip
-__gfx_TexturedVertLine2_NoClip:
+public __gfx_TexturedVertLine_NoClip
+__gfx_TexturedVertLine_NoClip:
 	; Set up iy register
 	ld  iy,0
 	add iy,sp
@@ -170,46 +160,32 @@ __gfx_TexturedVertLine2_NoClip:
 	add hl,bc
 	add hl,bc
 
-	;ld  a,(iy+15)         ; a = delta
-	ld  de,ti.lcdWidth     ; de = screen width
+	exx
+	ld  de,(iy+12)         ; de' = texture pointer
+	ld  h,e
+	ld  l,0                ; hl' = texture pointer (fixed point)
+	ld  bc,(iy+15)         ; bc' = delta (fixed point)
+	exx
 
-  exx
-  ;ld  de,(iy+12)         ; de' = texture pointer
-  ;ld  h,e                ; 
-  ;ld  l,(iy+18)          ; hl' = texture position counter
-  ;ld  bc,(iy+15)         ; bc' = delta
-  ld  de,(iy+12)         ; de' = texture pointer
-  ld  bc,(iy+15)         ; bc' = delta
-  ld  h,e
-  
-  ld  l,e          ; TODO: Fix this lmao
-  exx
+	ld  de,(iy+9)          ; de = length
+	ld  bc,1
+	ld  iy,drawVertTex
+	add iy,de
+	ld  de,ti.lcdWidth-1   ; de = screen width - 1
 
-  ;ld  iy,(iy+12)        ; iy = texture pointer
-  
+	jp (iy)
 
-  ;ld  bc,(iy)
+drawVertTex:
+repeat 180               ; Kids, SERIOUSLY don't try this at home...
+	exx
+	add hl,bc
+	ld  e,h
+	ld  a,(de)
+	exx
 
-  ;jp _DrawVert
-  ;jp $+400
-repeat 160               ; Kids, SERIOUSLY don't try this at home...
-  ;ld  bc,(iy+((%/((160/16)))*3))
-  exx
-  add hl,bc
-  ld  e,h
-  ex de,hl
-  ld  iy,(hl)
-  ex hl,de
- ;ld e, b                ; e = int part
-  ;ld a, c                ; a = decimal part
-  ;add hl,de
-  ;ld  iy, (hl)
-  exx
-
-  ;add iy,a
-
-  ld (hl),iy
-  add hl,de
+	ld (hl),a
+	add hl,bc
+	ld (hl),a
+	add hl,de
 end repeat
-
-  ret
+	ret
