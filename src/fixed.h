@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 typedef int24_t fixed24;
 
 #define FIX_SHIFT       8 

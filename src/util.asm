@@ -133,7 +133,7 @@ __gfx_VertLine2_NoClip:
 	ld  de,(iy+9)          ; de = length
 	ld  bc,(iy+12)         ; bc = c
 	ld  iy,drawVert        ; iy = memory address of draw function
-	add iy,de              ; offset pointer by the line length so it points to the right memory address
+	add iy,de              ; offset pointer by the line length to point to the right memory address
 	ld  de,ti.lcdWidth
 
 	jp (iy)                ; jump to correct memory address for drawing line length
@@ -166,8 +166,9 @@ __gfx_TexturedVertLine_NoClip:
 	ld  l,0                ; hl' = texture pointer (fixed point)
 	ld  bc,(iy+15)         ; bc' = delta (fixed point)
 	exx
-
+	
 	ld  de,(iy+9)          ; de = length
+	
 	ld  bc,1
 	ld  iy,drawVertTex
 	add iy,de

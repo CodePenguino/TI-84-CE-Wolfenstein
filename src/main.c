@@ -5,7 +5,40 @@
 #include "math.h"
 #include "util.h"
 
-uint8_t texture[32] = {
+// Holds information for the rendered texture
+uint8_t texture[64] = {
+	0xA0,
+	0xA1,
+	0xA2,
+	0xA3,
+	0xA4,
+	0xA5,
+	0xA6,
+	0xA7,
+	0xA8,
+	0xA9,
+	0xAA,
+	0xAB,
+	0xAC,
+	0xAD,
+	0xAE,
+	0xAF,
+	0xB0,
+	0xB1,
+	0xB2,
+	0xB3,
+	0xB4,
+	0xB5,
+	0xB6,
+	0xB7,
+	0xB8,
+	0xB9,
+	0xBA,
+	0xBB,
+	0xBC,
+	0xBD,
+	0xBE,
+	0xBF,
 	0xC0,
 	0xC1,
 	0xC2,
@@ -22,7 +55,7 @@ uint8_t texture[32] = {
 	0xCD,
 	0xCE,
 	0xCF,
-	0xD0,
+	0xC0,
 	0xD1,
 	0xD2,
 	0xD3,
@@ -71,20 +104,23 @@ int main(void)
 		if(key_pressed(kb_Up))
 			y -= 1;
 
+		/*for(uint24_t i = 0; i < 320; i+=2) {
+			gfx_TexturedVertLine_NoClip(i, 120-(y>>1), y, texture, delta_lut[y]);
+		}*/
+
 		for(uint16_t i = 0; i < 320; i+=2)
 		{
 			uint8_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
 			uint8_t line_length = (120-sine_length)<<1;
 
-			if(line_length > 10) {
-					gfx_TexturedVertLine_NoClip(i, sine_length-30 < 0 ? 0 : sine_length-30, line_length, texture, fxdiv(32, line_length));
-			}
+			gfx_TexturedVertLine_NoClip(i, sine_length-30, 
+					line_length, texture);
 		}
 
 		timer++;
 
 		gfx_SetTextXY(0,0);
-		gfx_PrintUInt(timer/4, 8);
+		//gfx_PrintUInt(timer, 8);
 
 		gfx_SwapDraw();
 		// gfx_palette[224] = gfx_palette[timer&255];		
