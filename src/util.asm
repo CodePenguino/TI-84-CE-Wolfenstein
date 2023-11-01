@@ -184,6 +184,7 @@ repeat 180               ; Kids, SERIOUSLY don't try this at home...
 	ld  a,(de)
 	exx
 
+  ; If anyone finds a better way to draw a line 2 pixels wide please let me know
 	ld (hl),a
 	add hl,bc
 	ld (hl),a

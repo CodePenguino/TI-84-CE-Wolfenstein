@@ -51,6 +51,6 @@ static inline void gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint8_t length,
 static inline void gfx_TexturedVertLine_NoClip(uint24_t x, uint8_t y, uint16_t length,
 		uint8_t* texture)
 {
-	if(length > 180) length = 180;
+	//if(length > 180) length = 180;
 	_gfx_TexturedVertLine_NoClip(x, y, 1620 - (9*length), texture, delta_lut[length]);
 }
