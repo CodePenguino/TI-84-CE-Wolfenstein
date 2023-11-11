@@ -20,6 +20,14 @@ typedef int24_t fixed24;
 
 // TODO: Maybe change to assembly instructions? ¯\_(ツ)_/¯
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+extern uint24_t _fx2uint();
+#ifdef __cplusplus
+}
+#endif
+
 // Convert int to fixed24
 #define int2fx(x) (fixed24)(x << FIX_SHIFT)
 // Convert float to fixed24

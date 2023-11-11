@@ -4,6 +4,20 @@
 #include "fixed.h"
 #include "math.h"
 #include "util.h"
+#include <string.h>
+#include <sys/timers.h>
+
+// TODO: Have this map do literally anything
+const uint8_t map[64] = {
+	1,1,1,1,1,1,1,1,
+	1,0,1,0,0,0,0,1,
+	1,0,1,0,0,0,0,1,
+	1,0,1,0,0,0,0,1,
+	1,0,0,0,0,0,0,1,
+	1,0,0,0,0,1,0,1,
+	1,0,0,0,0,0,0,1,
+	1,1,1,1,1,1,1,1,
+};
 
 // Holds information for the rendered texture
 uint8_t texture[64] = {
@@ -85,15 +99,23 @@ int main(void)
 
 	gfx_SetTextScale(2, 2);
 
-	fixed24 x = 2, y = 15;
+	fixed24 x = 2, y = 170;
 	uint24_t timer = 0;
 
-	gfx_SetTextFGColor(31);
+	gfx_SetTextFGColor(224);
+	// Draw HUD once at the beginning (TODO: Draw texture instead)
+	gfx_SetColor(29);
+	gfx_FillRectangle_NoClip(0, 180, 320, 60);
+	gfx_PrintStringXY("Put menu here", 0, 180);
+	gfx_SwapDraw();
+	gfx_FillRectangle_NoClip(0, 180, 320, 60);
+	gfx_PrintStringXY("Put menu here", 0, 180);
 
 	do
 	{
 		key_update();
-		gfx_ZeroScreen();
+		memset(gfx_vbuffer, 4, 28800);
+		memset(gfx_vbuffer+90, 6, 28800);
 
 		if(key_pressed(kb_Right))
 			x += 1;
@@ -104,27 +126,30 @@ int main(void)
 		if(key_pressed(kb_Up))
 			y -= 1;
 
-		/*for(uint24_t i = 0; i < 320; i+=2) {
-			gfx_TexturedVertLine_NoClip(i, 120-(y>>1), y, texture, delta_lut[y]);
-		}*/
+    uint8_t length = y;
+    #pragma unroll(2) 
+		for(uint24_t i = 0; i < 320; i+=2) {
+			length--;
+			length = clamp(length, 1, 180);
+			uint8_t y_pos = (120-(length>>1))-30;
+      gfx_TexturedVertLine_NoClip(i, y_pos, length, texture+timer);
+		}
 
-		for(uint16_t i = 0; i < 320; i+=2)
+		//gfx_SetTextXY(0,180);
+		//gfx_PrintInt(fx2uint(512), 8);
+		//#pragma unroll(2)
+		/*for(uint16_t i = 0; i < 320; i+=2)
 		{
 			uint8_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
 			uint8_t line_length = (120-sine_length)<<1;
 
-			gfx_TexturedVertLine_NoClip(i, sine_length-30, 
-					line_length, texture);
-		}
+			gfx_TexturedVertLine_NoClip(i, sine_length-30, line_length, texture);
+		}*/
 
 		timer++;
-
-		gfx_SetTextXY(0,0);
-		//gfx_PrintUInt(timer, 8);
+		if(timer > 64) { timer = 0; }
 
 		gfx_SwapDraw();
-		gfx_Wait();
-		// gfx_palette[224] = gfx_palette[timer&255];		
 	} while (!key_pressed(kb_2nd));
 
 	// Clear memory and gfx api (otherwise you get corrupted graphics)

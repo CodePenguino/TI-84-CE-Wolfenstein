@@ -2,7 +2,7 @@
 
   section .text
 	; Definitely not copy-pasted directly from the graphx source code ;)
-	public __getSinCos
+public __getSinCos
 __getSinCos:
 	; returns a = sin/cos(a) * 128
 	ld  c,a

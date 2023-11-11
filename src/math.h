@@ -5,6 +5,22 @@
 // Duplicate u8 to form a u16; (ex.) 0x12 -> 0x1212
 #define dup8(x) (uint16_t)(x | (x<<8))
 
+#define max(a, b) ({\
+	__typeof__ (a) _a = (a); \
+	__typeof__ (b) _b = (b); \
+	_a > _b ? _a : _b; })
+
+#define min(a, b) ({\
+	__typeof__ (a) _a = (a); \
+	__typeof__ (b) _b = (b); \
+	_a < _b ? _a : _b; })
+
+#define clamp(x, mn, mx) ({\
+	__typeof__ (x) _x = (x); \
+	__typeof__ (mn) _mn = (mn); \
+	__typeof__ (mx) _mx = (mx); \
+	max(_mn, min(_mx, _x)); })
+
 #ifdef __cplusplus
 extern "C" {
 #endif

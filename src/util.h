@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "lut/linestep.h"
+#include "math.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -23,7 +24,7 @@ extern void gfx_SetPixel2_NoClip(uint24_t x, uint8_t y, uint24_t c);
  * @param[in] length Length of the line
  * @param[in] c Color
  */
-extern void _gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint16_t length, uint24_t c);
+extern void _gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint24_t length, uint24_t c);
 
 /**
  * Draws a textured vertical line
@@ -51,6 +52,5 @@ static inline void gfx_VertLine2_NoClip(uint24_t x, uint8_t y, uint8_t length,
 static inline void gfx_TexturedVertLine_NoClip(uint24_t x, uint8_t y, uint16_t length,
 		uint8_t* texture)
 {
-	//if(length > 180) length = 180;
 	_gfx_TexturedVertLine_NoClip(x, y, 1620 - (9*length), texture, delta_lut[length]);
 }
