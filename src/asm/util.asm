@@ -115,35 +115,35 @@ _gfx_SetPixel2_NoClip:
 
 
 
-	public __gfx_VertLine2_NoClip
-__gfx_VertLine2_NoClip:
-	; Set up iy register
-	ld  iy,0
-	add iy,sp
-
-	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
-	ld  bc,(iy+3)          ; bc = x
-	add hl,bc              ; hl += bc
-	ld  c,(iy+6)           ; c = y
-	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
-	mlt bc                 ; bc = b * c = y * 160
-	add hl,bc
-	add hl,bc
-
-	ld  de,(iy+9)          ; de = length
-	ld  bc,(iy+12)         ; bc = c
-	ld  iy,drawVert        ; iy = memory address of draw function
-	add iy,de              ; offset pointer by the line length to point to the right memory address
-	ld  de,ti.lcdWidth
-
-	jp (iy)                ; jump to correct memory address for drawing line length
-
-drawVert:
-repeat 200               ; Kids, don't try this at home...
-	ld  (hl),bc
-	add hl,de
-end repeat
-	ret
+;	public __gfx_VertLine2_NoClip
+;__gfx_VertLine2_NoClip:
+;	; Set up iy register
+;	ld  iy,0
+;	add iy,sp
+;
+;	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
+;	ld  bc,(iy+3)          ; bc = x
+;	add hl,bc              ; hl += bc
+;	ld  c,(iy+6)           ; c = y
+;	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
+;	mlt bc                 ; bc = b * c = y * 160
+;	add hl,bc
+;	add hl,bc
+;
+;	ld  de,(iy+9)          ; de = length
+;	ld  bc,(iy+12)         ; bc = c
+;	ld  iy,drawVert        ; iy = memory address of draw function
+;	add iy,de              ; offset pointer by the line length to point to the right memory address
+;	ld  de,ti.lcdWidth
+;
+;	jp (iy)                ; jump to correct memory address for drawing line length
+;
+;drawVert:
+;repeat 200               ; Kids, don't try this at home...
+;	ld  (hl),bc
+;	add hl,de
+;end repeat
+;	ret
 
 public __gfx_TexturedVertLine_NoClip
 __gfx_TexturedVertLine_NoClip:
@@ -166,10 +166,10 @@ __gfx_TexturedVertLine_NoClip:
 	ld  l,0                ; hl' = texture pointer (fixed point)
 	ld  bc,(iy+15)         ; bc' = delta (fixed point)
 	exx
-	
+
 	ld  de,(iy+9)          ; de = length
-	
-	ld  bc,1
+
+	;ld  bc,1
 	ld  iy,drawVertTex
 	add iy,de
 	ld  de,ti.lcdWidth-1   ; de = screen width - 1
@@ -184,9 +184,9 @@ repeat 180               ; Kids, SERIOUSLY don't try this at home...
 	ld  a,(de)
 	exx
 
-  ; If anyone finds a better way to draw a line 2 pixels wide please let me know
+  ; If anyone finds a better way to draw a 2 pixel wide line please let me know
 	ld (hl),a
-	add hl,bc
+	inc hl
 	ld (hl),a
 	add hl,de
 end repeat

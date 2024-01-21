@@ -2,8 +2,6 @@
 
 #include <stdint.h>
 
-// TODO: Possibly add more than 180 elements
-
 const uint16_t delta_lut[200] = {
   16384,
   8192,

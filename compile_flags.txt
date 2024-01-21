@@ -1,7 +1,7 @@
 -I
-C:/CEdev/include
+../CEdev/include
 -L
-C:/CEdev/lib
+../CEdev/lib
 
 # My eyes...
 -D __INT24_TYPE__=__INT16_TYPE__

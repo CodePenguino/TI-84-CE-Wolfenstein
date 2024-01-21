@@ -12,7 +12,8 @@ CXXFLAGS = -Wall -Wextra -Oz
 ifndef CEDEV
 # $(error CEDEV environment path variable is not set)
 # Swap this location to wherever you have CEDev installed
-CEDEV ?= C:/CEDEV
+CEDEV ?= ../CEdev
+#CEDEV ?= C:/CEDEV
 endif
 
 include $(CEDEV)/meta/makefile.mk
