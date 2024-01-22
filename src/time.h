@@ -23,10 +23,12 @@ static inline uint16_t time_get()
 	return timer_Get(SYSTEM_TIMER);
 }
 
-static inline uint8_t time_get_fps()
+//#define time_get_fps() (32768 / time_delta)
+
+/*static inline uint16_t time_get_fps()
 {
 	return 32768 / time_delta;
-}
+}*/
 
 static inline void time_update()
 {

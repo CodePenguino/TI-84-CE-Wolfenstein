@@ -2,9 +2,9 @@
 #include <graphx.h>
 #include "input.h"
 #include "math/fixed.h"
-#include "math/math.h"
+//#include "math/math.h"
 #include "util.h"
-#include <string.h>
+//#include <string.h>
 #include <sys/timers.h>
 #include "debug.h"
 #include "time.h"
@@ -55,7 +55,7 @@ const uint8_t texture[64] = {
 	0xBD,
 	0xBE,
 	0xBF,
-	0xC0,
+	0xE0,
 	0xC1,
 	0xC2,
 	0xC3,
@@ -91,7 +91,7 @@ const uint8_t texture[64] = {
 
 int main(void)
 {
-	// Clear homescreen and set up gfx api
+	// Clear homescreen and set up gfx api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
 	os_ClrHome();
 	gfx_Begin();
 	gfx_SetDrawScreen();
@@ -114,14 +114,16 @@ int main(void)
 	gfx_PrintStringXY("Put menu here", 0, 180);
 
 	time_enable();
-	debug_enable();
+	benchmark_enable();
+
+	gfx_SetTextBGColor(0);
 
 	do
 	{
 		time_update();
 		key_update();
-		memset(gfx_vbuffer, 4, 28800);
-		memset(gfx_vbuffer+90, 6, 28800);
+		//memset(gfx_vbuffer, 4, 28800);
+		//memset(gfx_vbuffer+90, 6, 28800);
 
 		if(key_pressed(kb_Right))
 			x += 1;
@@ -132,38 +134,30 @@ int main(void)
 		if(key_pressed(kb_Up))
 			y -= 1;
 
-		//benchmark_start();
-		#pragma unroll(2)
+		benchmark_start();
+		int8_t y_pos = (120-(y>>1))-30;
+		if(y_pos < 0) y_pos = 0;
 		for(uint24_t i = 0; i < 320; i+=2) {
-			uint8_t y_pos = (120-(y>>1))-30;
 			gfx_TexturedVertLine_NoClip(i, y_pos, y,
-					texture/*+(lu_sin(timer*2)/4)*/);
+				texture/*+(lu_sin(timer*2)/4)*/);
 		}
-		//benchmark_stop();
-		//timer = benchmark_stop_time - benchmark_start_time;
+		benchmark_stop();
+		timer = benchmark_get_delta();
+
+		//uint8_t y_pos = (120-(y>>1))-30;
+		//(gfx_TexturedVertLine_NoClip(0, y_pos, y, texture));
+		//timer = benchmark_func(gfx_TexturedVertLine_NoClip(2, y_pos, y, texture));
 
 		gfx_SetTextXY(0, 200);
-		gfx_SetTextBGColor(0);
-		//gfx_PrintUInt(time_get_fps(), 8);
+		gfx_PrintUInt(delta_lut[y], 8);
 
-
-		//gfx_SetTextXY(0,180);
-		//gfx_PrintInt(fx2uint(512), 8);
-		//#pragma unroll(2)
-		/*for(uint16_t i = 0; i < 320; i+=2)
-		{
-			uint8_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
-			uint8_t line_length = (120-sine_length)<<1;
-
-			gfx_TexturedVertLine_NoClip(i, sine_length-30, line_length, texture);
-		}*/
-
-		timer++;
+		//timer++;
 		//timer %= 64;
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
 
+	benchmark_disable();
 	time_disable();
 
 	// Clear memory and gfx api (otherwise you get corrupted graphics)

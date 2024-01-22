@@ -169,7 +169,6 @@ __gfx_TexturedVertLine_NoClip:
 
 	ld  de,(iy+9)          ; de = length
 
-	;ld  bc,1
 	ld  iy,drawVertTex
 	add iy,de
 	ld  de,ti.lcdWidth-1   ; de = screen width - 1
