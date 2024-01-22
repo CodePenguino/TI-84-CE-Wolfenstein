@@ -91,7 +91,7 @@ const uint8_t texture[64] = {
 
 int main(void)
 {
-	// Clear homescreen and set up gfx api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
+	// Clear homescreen and set up gfx api
 	os_ClrHome();
 	gfx_Begin();
 	gfx_SetDrawScreen();
