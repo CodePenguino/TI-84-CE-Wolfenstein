@@ -4,7 +4,7 @@
 
 typedef int24_t fixed24;
 
-#define FIX_SHIFT       8 
+#define FIX_SHIFT       8
 #define FIX_SCALE       ( 1<<FIX_SHIFT		)
 #define FIX_MASK        ( FIX_SCALE-1		)
 #define FIX_SCALEF      ( (float)FIX_SCALE	)
@@ -23,10 +23,16 @@ typedef int24_t fixed24;
 #ifdef __cplusplus
 extern "C" {
 #endif
-extern uint24_t _fx2uint();
+extern char _fx2uint(fixed24 fixed);
 #ifdef __cplusplus
 }
 #endif
+
+/*static inline char _fx2uint(short fx)
+{
+	asm("ld hl, %0" : : "r" (fx));
+	asm("ld a, h");
+}*/
 
 // Convert int to fixed24
 #define int2fx(x) (fixed24)(x << FIX_SHIFT)

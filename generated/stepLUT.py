@@ -1,8 +1,8 @@
 import os
 
-FIX_SHIFT      = 8 
+FIX_SHIFT      = 8
 FIX_SCALE      = (1<<FIX_SHIFT)
-NUM_ELEMENTS   = 200
+NUM_ELEMENTS   = 255
 TEXTURE_HEIGHT = 64
 
 def fxdiv(a, b):
@@ -19,6 +19,17 @@ with open("delta.txt", "a") as f:
     for x in range(1, NUM_ELEMENTS):
         f.write("  ")
         f.write(str(int(fxdiv(TEXTURE_HEIGHT, x))))
+        f.write(",\n")
+
+    f.write("};\n\n")
+# ----------------------------------------
+    f.write("const uint8_t texture_offset_lut[")
+    f.write(str(NUM_ELEMENTS-180))
+    f.write("] = {\n")
+
+    for x in range(1, NUM_ELEMENTS-180):
+        f.write("  ")
+        f.write(str(int((64-fxdiv(45, x+180))>>1)))
         f.write(",\n")
 
     f.write("};\n")
