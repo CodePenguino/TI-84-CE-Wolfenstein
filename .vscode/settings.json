@@ -1,6 +1,6 @@
 {
   "C_Cpp.default.includePath": [
-    "C:/CEdev/include"
+    "~/Dev/TI-84/CEdev/include"
   ],
   "C_Cpp.errorSquiggles": "disabled",
   "files.associations": {

@@ -115,38 +115,8 @@ _gfx_SetPixel2_NoClip:
 
 
 
-;	public __gfx_VertLine2_NoClip
-;__gfx_VertLine2_NoClip:
-;	; Set up iy register
-;	ld  iy,0
-;	add iy,sp
-;
-;	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
-;	ld  bc,(iy+3)          ; bc = x
-;	add hl,bc              ; hl += bc
-;	ld  c,(iy+6)           ; c = y
-;	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
-;	mlt bc                 ; bc = b * c = y * 160
-;	add hl,bc
-;	add hl,bc
-;
-;	ld  de,(iy+9)          ; de = length
-;	ld  bc,(iy+12)         ; bc = c
-;	ld  iy,drawVert        ; iy = memory address of draw function
-;	add iy,de              ; offset pointer by the line length to point to the right memory address
-;	ld  de,ti.lcdWidth
-;
-;	jp (iy)                ; jump to correct memory address for drawing line length
-;
-;drawVert:
-;repeat 200               ; Kids, don't try this at home...
-;	ld  (hl),bc
-;	add hl,de
-;end repeat
-;	ret
-
-public __gfx_TexturedVertLine_NoClip
-__gfx_TexturedVertLine_NoClip:
+	public __gfx_TexturedVertLine_Partial
+__gfx_TexturedVertLine_Partial:
 	; Set up iy register
 	ld  iy,0
 	add iy,sp
@@ -154,20 +124,34 @@ __gfx_TexturedVertLine_NoClip:
 	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
 	ld  bc,(iy+3)          ; bc = x
 	add hl,bc              ; hl += bc
-	ld  c,(iy+6)           ; c = y
-	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
-	mlt bc                 ; bc = b * c = y * 160
-	add hl,bc
-	add hl,bc
+
+	ld  de,(iy+12)          ; de = otherLength
+	ld  bc,0xF1F1			; Uses a byte duplication trick to draw two pixels at once
+
+	ld  iy,drawVertLine
+	add iy,de
+	ld  de,ti.lcdWidth
+
+	;; jp (iy)
+
+	call __gfx_VertLine_NoClip
+	;; ld  c,(iy+6)           ; c = y
+	;; ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
+	;; mlt bc                 ; bc = b * c = y * 160
+	;; add hl,bc
+	;; add hl,bc
+
+	ld  iy,0
+	add iy,sp
 
 	exx
-	ld  de,(iy+12)         ; de' = texture pointer
+	ld  de,(iy+15)         ; de' = texture pointer
 	ld  h,e
 	ld  l,0                ; hl' = texture pointer (fixed point)
-	ld  bc,(iy+15)         ; bc' = delta (fixed point)
+	ld  bc,(iy+18)         ; bc' = delta (fixed point)
 	exx
 
-	ld  de,(iy+9)          ; de = length
+	ld  de,(iy+9)
 
 	ld  iy,drawVertTex
 	add iy,de
@@ -187,6 +171,38 @@ repeat 180               ; Kids, SERIOUSLY don't try this at home...
 	ld (hl),a
 	inc hl
 	ld (hl),a
+	add hl,de
+end repeat
+	ret
+
+	public __gfx_TexturedVertLine_Full
+__gfx_TexturedVertLine_Full:
+	ret
+
+	;; Draws a colored vertical line
+	public __gfx_VertLine_NoClip
+__gfx_VertLine_NoClip:
+	;; ld  de,...
+	;; ld  iy,drawVertLine
+	;; add iy,de
+	;; ld  de,ti.lcdWidth		; de = screen width - 1
+
+	;; ld  de,(iy+9)          ; de = length
+	;; ld  bc,(iy+12)         ; bc = c
+	;; ld  iy,drawVertLine        ; iy = memory address of draw function
+	;; add iy,de              ; offset pointer by the line length to point to the right memory address
+	;; ld  de,ti.lcdWidth
+
+	;; jp (iy)                ; jump to correct memory address for drawing line length
+
+	;; ld  a,drawVertLine
+	;; add iy,de
+	;; ld  de,ti.lcdWidth
+
+	;; This is fucked on so many levels...
+drawVertLine:
+repeat 90
+	ld (hl),bc
 	add hl,de
 end repeat
 	ret

@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include "lut/linestep.h"
-#include "math/fixed.h"
+//#include "math/fixed.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,8 +36,11 @@ extern void gfx_SetPixel2_NoClip(uint24_t x, uint8_t y, uint24_t c);
  * @param[in] texture Pointer to the texture drawn
  * @param[in] delta Step size for each pixel (in fixed point)
  */
-extern void _gfx_TexturedVertLine_NoClip(uint24_t x, uint8_t y,
-		uint24_t length, uint8_t* texture, uint16_t delta);
+extern void _gfx_TexturedVertLine_Partial(uint24_t x, uint8_t y,
+		uint24_t length, uint24_t otherLength, uint8_t* texture, uint16_t delta);
+
+extern void _gfx_TexturedVertLine_Full(uint24_t x, uint8_t* texture,
+		uint16_t delta);
 
 #ifdef __cplusplus
 }
@@ -50,17 +53,19 @@ extern void _gfx_TexturedVertLine_NoClip(uint24_t x, uint8_t y,
 	_gfx_VertLine2_NoClip(x, y, 600 - (3*length), c);
 }*/
 
-static inline void gfx_TexturedVertLine_NoClip(uint24_t x, uint8_t y,
+static inline void gfx_TexturedVertLine(uint24_t x, uint8_t y,
 		uint24_t length, const uint8_t* texture)
 {
 	if(length <= 180)
 	{
-		_gfx_TexturedVertLine_NoClip(x, y, 1620 - (9*length), (uint8_t*)texture,
-			delta_lut[length]);
+		int8_t y_pos = (120-(length>>1))-30;
+		//                               otherLength = 180 - (2*((180-length)/2))
+		_gfx_TexturedVertLine_Partial(x, y, 1620 - (9*length), y_pos/4,
+			(uint8_t*)texture, delta_lut[length]);
 	}
 	else
 	{
-		_gfx_TexturedVertLine_NoClip(x, y, 0, (uint8_t*)texture+
+		_gfx_TexturedVertLine_Full(x, (uint8_t*)texture+
 			texture_offset_lut[length-180], delta_lut[length]);
 			//((90-delta_lut[length])>>1), delta_lut[length]);
 	}

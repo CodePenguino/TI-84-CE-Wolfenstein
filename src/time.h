@@ -1,6 +1,7 @@
 #pragma once
 
 #include <sys/timers.h>
+#include <stdint.h>
 
 #define SYSTEM_TIMER 1
 

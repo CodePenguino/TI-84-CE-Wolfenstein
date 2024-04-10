@@ -1,0 +1,31 @@
+[
+ {
+  "directory": "/home/cpu/Dev/TI-84/TI-84-CE-Wolfenstein",
+  "arguments": [
+   "/home/cpu/Dev/TI-84/CEdev/bin/ez80-clang",
+   "-MD",
+   "-c",
+   "-emit-llvm",
+   "-nostdinc",
+   "-isystem",
+   "/home/cpu/Dev/TI-84/CEdev/include",
+   "-Isrc",
+   "-fno-threadsafe-statics",
+   "-Xclang",
+   "-mllvm",
+   "-DNDEBUG",
+   "-g0",
+   "-Wall",
+   "-Wextra",
+   "-Oz",
+   "src/main.c",
+   "-o",
+   "obj/src/main.c.bc",
+   "-D",
+   "__INT24_TYPE__=__INT16_TYPE__",
+   "-D",
+   "__UINT24_TYPE__=__UINT16_TYPE__"
+  ],
+  "file": "src/main.c"
+ }
+]

@@ -9,6 +9,7 @@
 #include "benchmark.h"
 #include "time.h"
 #include <debug.h>
+#include "math/math.h"
 
 // TODO: Have this map do literally anything
 const uint8_t map[64] = {
@@ -92,14 +93,14 @@ const uint8_t texture[64] = {
 
 void check_inputs(fixed24* x, fixed24* y)
 {
-		if(key_pressed(kb_Right))
-			*x += 1;
-		if(key_pressed(kb_Left))
-			*x -= 1;
-		if(key_pressed(kb_Down))
-			*y += 1;
-		if(key_pressed(kb_Up))
-			*y -= 1;
+	if(key_pressed(kb_Right))
+		*x += 1;
+	if(key_pressed(kb_Left))
+		*x -= 1;
+	if(key_pressed(kb_Down))
+		*y += 1;
+	if(key_pressed(kb_Up))
+		*y -= 1;
 }
 
 int main(void)
@@ -118,6 +119,7 @@ int main(void)
 	int timer = 0;
 
 	gfx_SetTextFGColor(224);
+
 	// Draw HUD once at the beginning (TODO: Draw texture instead)
 	gfx_SetColor(29);
 	gfx_FillRectangle_NoClip(0, 180, 320, 60);
@@ -133,7 +135,8 @@ int main(void)
 
 	dbg_ClearConsole();
 
-	bool start_draw_line = 0;
+
+	/* bool start_draw_line = 0; */
 
 	do
 	{
@@ -142,21 +145,19 @@ int main(void)
 		key_update();
 		check_inputs(&x, &y);
 
-		benchmark_start();
+		//benchmark_start();
 		#pragma unroll(2)
-		for(uint24_t i = (int)start_draw_line*2; i < 320; i+=2) {
-			int8_t y_pos = (120-((y)>>1))-30;
+		for(uint24_t i = 0; i < 320; i+=2)
+		{
+			int8_t y_pos = (120-(y>>1))-30;
 			if(y_pos < 0) y_pos = 0;
-			gfx_TexturedVertLine_NoClip(i, y_pos, y, texture);
+			gfx_TexturedVertLine(i, y_pos,
+				y, texture);
 		}
-		benchmark_stop();
 
-		//start_draw_line = !start_draw_line;
-
-		gfx_SetTextXY(0, 200);
-		dbg_printf("%d\n", time_delta);
-		//gfx_PrintUInt(benchmark_get_time(), 8);
-		//dbg_printf("%d\n", time_get_fps());
+		dbg_printf("%d\n", time_get_fps());
+		//gfx_SetTextXY(0, 200);
+		timer++;
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
