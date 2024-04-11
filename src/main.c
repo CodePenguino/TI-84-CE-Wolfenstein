@@ -88,7 +88,7 @@ const uint8_t texture[64] = {
 	0xDC,
 	0xDD,
 	0xDE,
-	0xDF,
+	0x00,
 };
 
 void check_inputs(fixed24* x, fixed24* y)
@@ -115,7 +115,7 @@ int main(void)
 
 	gfx_SetTextScale(2, 2);
 
-	fixed24 x = 2, y = 180;
+	fixed24 x = 2, y = 178;
 	int timer = 0;
 
 	gfx_SetTextFGColor(224);
@@ -140,23 +140,28 @@ int main(void)
 
 	do
 	{
+		gfx_SetColor(29);
+		gfx_FillRectangle_NoClip(0, 180, 320, 60);
 		//gfx_BlitScreen();
 		time_update();
 		key_update();
 		check_inputs(&x, &y);
 
 		//benchmark_start();
-		#pragma unroll(2)
+		//#pragma unroll(2)
 		for(uint24_t i = 0; i < 320; i+=2)
 		{
-			int8_t y_pos = (120-(y>>1))-30;
-			if(y_pos < 0) y_pos = 0;
-			gfx_TexturedVertLine(i, y_pos,
-				y, texture);
+			//int8_t y_pos = (120-(y>>1))-30;
+			//if(y_pos < 0) y_pos = 0;
+			gfx_TexturedVertLine(i, y, texture);
 		}
 
-		dbg_printf("%d\n", time_get_fps());
-		//gfx_SetTextXY(0, 200);
+		//dbg_printf("%d\n", time_get_fps());
+		gfx_SetTextXY(0, 200);
+		gfx_PrintUInt(x, 8);
+
+		gfx_SetTextXY(0, 220);
+		gfx_PrintUInt(y, 8);
 		timer++;
 
 		gfx_SwapDraw();

@@ -132,8 +132,6 @@ __gfx_TexturedVertLine_Partial:
 	add iy,de
 	ld  de,ti.lcdWidth
 
-	;; jp (iy)
-
 	call __gfx_VertLine_NoClip
 	;; ld  c,(iy+6)           ; c = y
 	;; ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
@@ -198,6 +196,8 @@ __gfx_VertLine_NoClip:
 	;; ld  a,drawVertLine
 	;; add iy,de
 	;; ld  de,ti.lcdWidth
+
+	jp (iy)
 
 	;; This is fucked on so many levels...
 drawVertLine:
