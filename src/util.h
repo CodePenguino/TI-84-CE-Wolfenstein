@@ -60,7 +60,7 @@ static inline void gfx_TexturedVertLine(uint24_t x,
 	{
 		//int8_t ceiling_length = (180-length)/2;           //(120-(length>>1))-30;
 		//                               otherLength = 180 - (2*((180-length)/2))
-		_gfx_TexturedVertLine_Partial(x, 0, 1620 - (9*length), 3*(length>>1),
+		_gfx_TexturedVertLine_Partial(x, 0, 1620 - (9*length), (length*3)>>1,
 			(uint8_t*)texture, delta_lut[length]);
 	}
 	else

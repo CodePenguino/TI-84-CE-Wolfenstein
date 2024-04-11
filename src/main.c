@@ -88,7 +88,7 @@ const uint8_t texture[64] = {
 	0xDC,
 	0xDD,
 	0xDE,
-	0x00,
+	0xDF,
 };
 
 void check_inputs(fixed24* x, fixed24* y)
@@ -151,17 +151,9 @@ int main(void)
 		//#pragma unroll(2)
 		for(uint24_t i = 0; i < 320; i+=2)
 		{
-			//int8_t y_pos = (120-(y>>1))-30;
-			//if(y_pos < 0) y_pos = 0;
 			gfx_TexturedVertLine(i, y, texture);
 		}
 
-		//dbg_printf("%d\n", time_get_fps());
-		gfx_SetTextXY(0, 200);
-		gfx_PrintUInt(x, 8);
-
-		gfx_SetTextXY(0, 220);
-		gfx_PrintUInt(y, 8);
 		timer++;
 
 		gfx_SwapDraw();
