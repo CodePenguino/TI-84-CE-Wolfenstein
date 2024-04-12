@@ -36,11 +36,11 @@ extern void gfx_SetPixel2_NoClip(uint24_t x, uint8_t y, uint24_t c);
  * @param[in] texture Pointer to the texture drawn
  * @param[in] delta Step size for each pixel (in fixed point)
  */
-extern void _gfx_TexturedVertLine_Partial(uint24_t x, uint8_t y,
-		uint24_t length, uint24_t otherLength, uint8_t* texture, uint16_t delta);
+extern void _gfx_TexturedVertLine_Partial(uint24_t x, uint24_t length,
+	uint24_t otherLength, uint8_t* texture, uint16_t delta);
 
 extern void _gfx_TexturedVertLine_Full(uint24_t x, uint8_t* texture,
-		uint16_t delta);
+	uint16_t delta);
 
 #ifdef __cplusplus
 }
@@ -53,14 +53,14 @@ extern void _gfx_TexturedVertLine_Full(uint24_t x, uint8_t* texture,
 	_gfx_VertLine2_NoClip(x, y, 600 - (3*length), c);
 }*/
 
-static inline void gfx_TexturedVertLine(uint24_t x,
-		uint24_t length, const uint8_t* texture)
+static inline void gfx_TexturedVertLine(uint24_t x, uint24_t length,
+	const uint8_t* texture)
 {
 	if(length < 180)
 	{
 		//int8_t ceiling_length = (180-length)/2;           //(120-(length>>1))-30;
 		//                               otherLength = 180 - (2*((180-length)/2))
-		_gfx_TexturedVertLine_Partial(x, 0, 1620 - (9*length), (length*3)>>1,
+		_gfx_TexturedVertLine_Partial(x, 1620 - (9*length), (3*length)>>1,
 			(uint8_t*)texture, delta_lut[length]);
 	}
 	else

@@ -9,7 +9,7 @@
 #include "benchmark.h"
 #include "time.h"
 #include <debug.h>
-#include "math/math.h"
+//#include "math/math.h"
 
 // TODO: Have this map do literally anything
 const uint8_t map[64] = {
@@ -23,8 +23,10 @@ const uint8_t map[64] = {
 	1,1,1,1,1,1,1,1,
 };
 
+extern uint8_t test_texture[];
+
 // Holds information for the rendered texture
-const uint8_t texture[64] = {
+/*const uint8_t texture[64] = {
 	0xA0,
 	0xA1,
 	0xA2,
@@ -89,7 +91,7 @@ const uint8_t texture[64] = {
 	0xDD,
 	0xDE,
 	0xDF,
-};
+};*/
 
 void check_inputs(fixed24* x, fixed24* y)
 {
@@ -140,20 +142,26 @@ int main(void)
 
 	do
 	{
-		gfx_SetColor(29);
-		gfx_FillRectangle_NoClip(0, 180, 320, 60);
 		//gfx_BlitScreen();
-		time_update();
 		key_update();
 		check_inputs(&x, &y);
 
 		//benchmark_start();
-		//#pragma unroll(2)
 		for(uint24_t i = 0; i < 320; i+=2)
 		{
-			gfx_TexturedVertLine(i, y, texture);
+			gfx_TexturedVertLine(i, y, test_texture);
+			gfx_TexturedVertLine(i+=2, y, test_texture);
 		}
 
+		//dbg_printf("%d\n", time_get_fps());
+
+		gfx_SetTextXY(0, 0);
+		gfx_PrintUInt(time_get_fps(), 8);
+
+		// It took me WAY too long to figure out that you need this if you don't want
+		// ALL the graphics to occasionally mess up for no apparent reason
+		//gfx_BlitScreen();
+		timer_1_Counter = 0;
 		timer++;
 
 		gfx_SwapDraw();

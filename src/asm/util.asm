@@ -125,8 +125,8 @@ __gfx_TexturedVertLine_Partial:
 	ld  bc,(iy+3)          ; bc = x
 	add hl,bc              ; hl += bc
 
-	ld  de,(iy+12)          ; de = otherLength
-	ld  bc,0xF1F1			; Uses a byte duplication trick to draw two pixels at once
+	ld  de,(iy+9)          ; de = otherLength
+	ld  bc,0xF1F1F1		; Uses a byte duplication trick to draw two pixels at once
 
 	ld  iy,drawVertLine
 	add iy,de
@@ -143,13 +143,13 @@ __gfx_TexturedVertLine_Partial:
 	add iy,sp
 
 	exx
-	ld  de,(iy+15)         ; de' = texture pointer
+	ld  de,(iy+12)         ; de' = texture pointer
 	ld  h,e
 	ld  l,0                ; hl' = texture pointer (fixed point)
-	ld  bc,(iy+18)         ; bc' = delta (fixed point)
+	ld  bc,(iy+15)         ; bc' = delta (fixed point)
 	exx
 
-	ld  de,(iy+9)
+	ld  de,(iy+6)
 
 	ld  iy,drawVertTex
 	add iy,de
@@ -171,7 +171,20 @@ repeat 180               ; Kids, SERIOUSLY don't try this at home...
 	ld (hl),a
 	add hl,de
 end repeat
-	ret
+
+	ld  iy,0
+	add iy,sp
+
+	ld  de,(iy+9)          ; de = otherLength
+	ld  bc,0xEFEFEF		; Uses a byte duplication trick to draw two pixels at once
+
+	ld  iy,drawVertLine
+	add iy,de
+	ld  de,ti.lcdWidth
+
+	jp (iy)
+
+	;; call __gfx_VertLine_NoClip
 
 	public __gfx_TexturedVertLine_Full
 __gfx_TexturedVertLine_Full:
