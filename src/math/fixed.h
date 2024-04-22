@@ -5,34 +5,20 @@
 typedef int24_t fixed24;
 
 #define FIX_SHIFT       8
-#define FIX_SCALE       ( 1<<FIX_SHIFT		)
-#define FIX_MASK        ( FIX_SCALE-1		)
-#define FIX_SCALEF      ( (float)FIX_SCALE	)
-#define FIX_SCALEF_INV	( 1.0/FIX_SCALEF	)
+#define FIX_SCALE       (1<<FIX_SHIFT)
+#define FIX_MASK        (FIX_SCALE-1)
+#define FIX_SCALEF      ((float)FIX_SCALE)
+#define FIX_SCALEF_INV  (1.0/FIX_SCALEF)
 
 #define FIX_ONE         FIX_SCALE
 
 // Get fixed24 point reciprocal of a, in fp fractional bits
-#define FX_RECIPROCAL(a, fp) ( ((1<<(fp))+(a)-1)/(a) )
+//#define FX_RECIPROCAL(a, fp) ( ((1<<(fp))+(a)-1)/(a) )
 
 // Division approximation by reciprocal multiplication. Basically x * (1 / a)
-#define FX_RECIMUL(x, a, fp) ( ((x)*((1<<(fp))+(a)-1)/(a))>>(fp) )
+//#define FX_RECIMUL(x, a, fp) ( ((x)*((1<<(fp))+(a)-1)/(a))>>(fp) )
 
 // TODO: Maybe change to assembly instructions? ¯\_(ツ)_/¯
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-extern char _fx2uint(fixed24 fixed);
-#ifdef __cplusplus
-}
-#endif
-
-/*static inline char _fx2uint(short fx)
-{
-	asm("ld hl, %0" : : "r" (fx));
-	asm("ld a, h");
-}*/
 
 // Convert int to fixed24
 #define int2fx(x) (fixed24)(x << FIX_SHIFT)

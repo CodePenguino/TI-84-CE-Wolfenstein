@@ -9,7 +9,7 @@
 #include "benchmark.h"
 #include "time.h"
 #include <debug.h>
-//#include "math/math.h"
+#include "math/math.h"
 
 // TODO: Have this map do literally anything
 const uint8_t map[64] = {
@@ -25,75 +25,7 @@ const uint8_t map[64] = {
 
 extern uint8_t test_texture[];
 
-// Holds information for the rendered texture
-/*const uint8_t texture[64] = {
-	0xA0,
-	0xA1,
-	0xA2,
-	0xA3,
-	0xA4,
-	0xA5,
-	0xA6,
-	0xA7,
-	0xA8,
-	0xA9,
-	0xAA,
-	0xAB,
-	0xAC,
-	0xAD,
-	0xAE,
-	0xAF,
-	0xB0,
-	0xB1,
-	0xB2,
-	0xB3,
-	0xB4,
-	0xB5,
-	0xB6,
-	0xB7,
-	0xB8,
-	0xB9,
-	0xBA,
-	0xBB,
-	0xBC,
-	0xBD,
-	0xBE,
-	0xBF,
-	0xE0,
-	0xC1,
-	0xC2,
-	0xC3,
-	0xC4,
-	0xC5,
-	0xC6,
-	0xC7,
-	0xC8,
-	0xC9,
-	0xCA,
-	0xCB,
-	0xCC,
-	0xCD,
-	0xCE,
-	0xCF,
-	0xD0,
-	0xD1,
-	0xD2,
-	0xD3,
-	0xD4,
-	0xD5,
-	0xD6,
-	0xD7,
-	0xD8,
-	0xD9,
-	0xDA,
-	0xDB,
-	0xDC,
-	0xDD,
-	0xDE,
-	0xDF,
-};*/
-
-void check_inputs(fixed24* x, fixed24* y)
+static inline void check_inputs(fixed24* x, fixed24* y)
 {
 	if(key_pressed(kb_Right))
 		*x += 1;
@@ -117,7 +49,7 @@ int main(void)
 
 	gfx_SetTextScale(2, 2);
 
-	fixed24 x = 2, y = 178;
+	fixed24 x = 2, y = 15;
 	int timer = 0;
 
 	gfx_SetTextFGColor(224);
@@ -137,30 +69,34 @@ int main(void)
 
 	dbg_ClearConsole();
 
-
-	/* bool start_draw_line = 0; */
-
-	do
-	{
-		//gfx_BlitScreen();
+	do {
 		key_update();
 		check_inputs(&x, &y);
 
 		//benchmark_start();
-		for(uint24_t i = 0; i < 320; i+=2)
-		{
-			gfx_TexturedVertLine(i, y, test_texture);
-			gfx_TexturedVertLine(i+=2, y, test_texture);
+		// Unroll fixes weird texture glitching. No clue how/why this fixes it
+		#pragma unroll(2)
+		for(uint24_t i = 2; i < 318; i+=2) {
+			uint24_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
+			uint24_t line_length = (120-sine_length)<<1;
+			gfx_TexturedVertLine(i, line_length, test_texture);
 		}
 
-		//dbg_printf("%d\n", time_get_fps());
+		//register int i asm("pc");
 
+		// GCC does a stupid
+		//#pragma GCC diagnostic push
+		//#pragma GCC diagnostic ignored "-Wunused-value"
+
+		//dbg_printf("%d\n", fx2uint(256));
+		//#pragma GCC diagnostic pop
+
+		//dbg_printf("%d\n", time_get_fps());
 		gfx_SetTextXY(0, 0);
-		gfx_PrintUInt(time_get_fps(), 8);
+		gfx_PrintUInt(time_get_fps(), 2);
 
 		// It took me WAY too long to figure out that you need this if you don't want
 		// ALL the graphics to occasionally mess up for no apparent reason
-		//gfx_BlitScreen();
 		timer_1_Counter = 0;
 		timer++;
 
