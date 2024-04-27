@@ -136,7 +136,7 @@ __gfx_TexturedVertLine_Full:
 	public __gfx_VertLine_NoClip
 __gfx_VertLine_NoClip:
 	jp (iy)
-
+ 
 	;; This is fucked on so many levels...
 drawVertLine:
 repeat 90

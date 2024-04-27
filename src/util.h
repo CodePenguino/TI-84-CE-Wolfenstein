@@ -40,7 +40,7 @@ extern void gfx_SetPixel2_NoClip(uint24_t x, uint8_t y, uint24_t c);
 extern void _gfx_TexturedVertLine_Partial(uint24_t x, uint24_t length,
 	uint24_t other_length, const uint8_t* texture, uint24_t delta);
 
-extern void _gfx_TexturedVertLine_Full(uint24_t x, uint8_t* texture,
+extern void _gfx_TexturedVertLine_Full(uint24_t x, const uint8_t* texture,
 	uint24_t texture_offset, uint24_t delta);
 
 #ifdef __cplusplus
@@ -50,13 +50,13 @@ extern void _gfx_TexturedVertLine_Full(uint24_t x, uint8_t* texture,
 static inline void gfx_TexturedVertLine(uint24_t x, uint24_t length,
 										const uint8_t* texture) {
 	if(length < 180) {
-		//int8_t ceiling_length = (180-length)/2;           //(120-(length>>1))-30;
-		//                               otherLength = 180 - (2*((180-length)/2))
+        // other_length = 180 - (2*((180-length)/2))
 		_gfx_TexturedVertLine_Partial(x, 1620 - (9*length), (length>>1)*3,
-			(uint8_t*)texture, texture_lut[length]);
+			texture, texture_lut_u24[length]);
 	}
 	else {
-		_gfx_TexturedVertLine_Full(x, (uint8_t*)texture,
-			texture_offset_lut[length-180], texture_lut[length]);
+        length -= 180;
+		_gfx_TexturedVertLine_Full(x, texture,
+			texture_offset_lut[length], texture_lut_u8[length]);
 	}
 }

@@ -4,8 +4,8 @@ DESCRIPTION = "Woflenstein raycaster for the Ti84 Plus CE by Rodrigo Agras"
 COMPRESSED = NO
 ARCHIVED = NO
 
-CFLAGS = -Wall -Wextra -Oz
-CXXFLAGS = -Wall -Wextra -Oz
+CFLAGS = -Wall -Wextra -O3
+CXXFLAGS = -Wall -Wextra -O3
 
 # ----------------------------
 
@@ -17,3 +17,8 @@ CEDEV ?= ../CEdev
 endif
 
 include $(CEDEV)/meta/makefile.mk
+
+all: run
+
+run:
+	CEmu --launch ./bin/WOLF3D.bin --send ./bin/WOLF3D.8xp --fullscreen 1

@@ -12,12 +12,6 @@ typedef int24_t fixed24;
 
 #define FIX_ONE         FIX_SCALE
 
-// Get fixed24 point reciprocal of a, in fp fractional bits
-//#define FX_RECIPROCAL(a, fp) ( ((1<<(fp))+(a)-1)/(a) )
-
-// Division approximation by reciprocal multiplication. Basically x * (1 / a)
-//#define FX_RECIMUL(x, a, fp) ( ((x)*((1<<(fp))+(a)-1)/(a))>>(fp) )
-
 // TODO: Maybe change to assembly instructions? ¯\_(ツ)_/¯
 
 // Convert int to fixed24
