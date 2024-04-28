@@ -37,11 +37,12 @@ __gfx_TexturedVertLine_Partial:
 	add hl,de              ; hl += de
 
 	ld  de,(iy+9)          ; de = otherLength
-	ld  bc,0xF1F1F1		; Uses a byte duplication trick to draw two pixels at once
+	ld  a,0x11
+	;ld  bc,0xF1F1F1		; Uses a byte duplication trick to draw two pixels at once
 
 	ld  iy,drawVertLine
 	add iy,de
-	ld  de,ti.lcdWidth
+	ld  de,ti.lcdWidth/2
 
 	call __gfx_VertLine_NoClip
 	;; ld  c,(iy+6)           ; c = y
@@ -65,7 +66,7 @@ __gfx_TexturedVertLine_Partial:
 	ld  iy,drawVertTex
 	add iy,de
 	ld  de,ti.lcdWidth-1   ; de = screen width - 1
-	ld  b,0
+	ld  b,0                ; Don't return early
 
 	jp (iy)
 
@@ -128,8 +129,8 @@ __gfx_TexturedVertLine_Full:
 	exx
 
 	ld  de,ti.lcdWidth-1   ; de = screen width - 1
-	ld  b,1				   ; Used to return from drawVertTex early only if called from
-						   ; this function
+	ld  b,1				   ; Used to return from drawVertTex early only if
+						   ; called from this function
 	jp drawVertTex
 
 	;; Draws a colored vertical line
@@ -140,7 +141,26 @@ __gfx_VertLine_NoClip:
 	;; This is fucked on so many levels...
 drawVertLine:
 repeat 90
-	ld (hl),bc
+	ld (hl),a
 	add hl,de
 end repeat
+	ret
+
+	public __gfx_VertLine_Scuffed
+__gfx_VertLine_Scuffed:
+	ld  iy,0
+	add iy,sp
+
+	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
+	ld  bc,(iy+3)          ; bc = x
+	add hl,bc              ; hl += bc
+
+	ld  de,(iy+6)          ; de = length
+	ld  a,(iy+9)           ; Uses a byte duplication trick to draw two pixels at once
+	
+	ld  iy,drawVertLine
+	add iy,de
+	ld  de,ti.lcdWidth/2
+
+	jp (iy)
 	ret

@@ -43,15 +43,41 @@ extern void _gfx_TexturedVertLine_Partial(uint24_t x, uint24_t length,
 extern void _gfx_TexturedVertLine_Full(uint24_t x, const uint8_t* texture,
 	uint24_t texture_offset, uint24_t delta);
 
+extern void _gfx_VertLine_NoClip();
+
+extern void _gfx_VertLine_Scuffed(uint24_t x, uint24_t length, uint8_t color);
+
 #ifdef __cplusplus
 }
 #endif
 
+static inline void gfx_VertLine_Scuffed(uint24_t x, uint24_t length,
+		uint8_t color) {
+	_gfx_VertLine_Scuffed(x, 180-(length<<1), color);
+}
+
+//static inline void gfx_VertLine_Scuffed(uint24_t x, uint24_t length,
+//        uint8_t color) {
+    // de = length
+    // bc = color
+    // iy = drawVertLine + length
+    /*length = 0;
+
+    asm("ld hl, (0E30000h+0014h)");
+    asm("ld bc, (%0)" :: "r" (&x));
+    asm("add hl, bc");
+
+    asm("ld de, (%0)" :: "r" (&length));
+    asm("ld bc, (%0)" :: "r" (&color));
+
+    _gfx_VertLine_NoClip();*/
+//}
+
 static inline void gfx_TexturedVertLine(uint24_t x, uint24_t length,
-										const uint8_t* texture) {
+        const uint8_t* texture) {
 	if(length < 180) {
         // other_length = 180 - (2*((180-length)/2))
-		_gfx_TexturedVertLine_Partial(x, 1620 - (9*length), (length>>1)*3,
+		_gfx_TexturedVertLine_Partial(x, 1620 - (9*length), 0/*length*/,
 			texture, texture_lut_u24[length]);
 	}
 	else {

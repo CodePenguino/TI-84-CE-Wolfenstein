@@ -1,3 +1,4 @@
+#include <tice.h>
 #include <ti/screen.h>
 #include <graphx.h>
 #include "input.h"
@@ -6,7 +7,6 @@
 #include "util.h"
 //#include <string.h>
 #include <sys/timers.h>
-#include "benchmark.h"
 #include "time.h"
 #include <debug.h>
 #include "math/math.h"
@@ -44,8 +44,9 @@ int main(void) {
 
 	// Set up basic color palette
 	gfx_SetDefaultPalette(gfx_8bpp);
+	lcd_Control = (uint24_t)0x13925; // 4 bpp mode
 
-	gfx_SetTextScale(2, 2);
+	gfx_SetTextScale(1, 1);
 
 	fixed24 x = 2, y = 15;
 	int timer = 0;
@@ -70,20 +71,31 @@ int main(void) {
 	do {
 		key_update();
 		check_inputs(&x, &y);
+		gfx_ZeroScreen();
 
-		for(uint24_t i = 2; i < 318; i+=2) {
-			uint24_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
-			uint24_t line_length = (120-sine_length)<<1;
-			gfx_TexturedVertLine(i, line_length, test_texture);
+		//gfx_SetColor(0xFF);
+		//gfx_VertLine_NoClip(0, 0, 70);
+		//gfx_TexturedVertLine(0, 1, test_texture);
+
+		// Apparently doing this is quicker than doing a normal for loop
+		for(uint8_t i = 158; i > 0; i--) {
+			gfx_VertLine_Scuffed(i, 90, 0xCF);
 		}
 
-		gfx_SetTextXY(0, 0);
-		gfx_PrintUInt(time_get_fps(), 2);
+		/*for(uint24_t i = 2; i < 318; i+=2) {
+		  uint24_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
+		  uint24_t line_length = (120-sine_length)<<1;
+		  gfx_TexturedVertLine(i, line_length, test_texture);
+		  }
+
+		  gfx_SetTextXY(0, 0);
+		  gfx_PrintUInt(time_get_fps(), 2);
 
 		// Idk why, but this (somewhat) fixes a weird bug where line graphics
-        // glitch out for no apparent reason.
+		// glitch out for no apparent reason.
 		timer_1_Counter = 0;
-        timer++;
+		timer++;*/
+		timer++;
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
