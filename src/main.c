@@ -54,12 +54,12 @@ int main(void) {
 	gfx_SetTextFGColor(224);
 
 	// Draw HUD once at the beginning (TODO: Draw texture instead)
-	gfx_SetColor(29);
-	gfx_FillRectangle_NoClip(0, 180, 320, 60);
-	gfx_PrintStringXY("Put menu here", 0, 180);
-	gfx_SwapDraw();
-	gfx_FillRectangle_NoClip(0, 180, 320, 60);
-	gfx_PrintStringXY("Put menu here", 0, 180);
+	//gfx_SetColor(29);
+	//gfx_FillRectangle_NoClip(0, 180, 320, 60);
+	//gfx_PrintStringXY("Put menu here", 0, 180);
+	//gfx_SwapDraw();
+	//gfx_FillRectangle_NoClip(0, 180, 320, 60);
+	//gfx_PrintStringXY("Put menu here", 0, 180);
 
 	time_enable();
 	//benchmark_enable();
@@ -73,14 +73,17 @@ int main(void) {
 		check_inputs(&x, &y);
 		gfx_ZeroScreen();
 
-		//gfx_SetColor(0xFF);
-		//gfx_VertLine_NoClip(0, 0, 70);
-		//gfx_TexturedVertLine(0, 1, test_texture);
+		for(uint8_t i = 158; i > 0; i--) {
+			_gfx_TexturedVertLine_Partial(i, 1260 - (timer)* 7, 180,
+				test_texture, texture_lut_u24[timer]);
+		}
+
+		//gfx_VertLine_Scuffed(0, 90, 0xCF);
 
 		// Apparently doing this is quicker than doing a normal for loop
-		for(uint8_t i = 158; i > 0; i--) {
-			gfx_VertLine_Scuffed(i, 90, 0xCF);
-		}
+		//for(uint8_t i = 158; i > 0; i--) {
+			//gfx_VertLine_Scuffed(i, 90, 0xCF);
+		//}
 
 		/*for(uint24_t i = 2; i < 318; i+=2) {
 		  uint24_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
@@ -95,7 +98,12 @@ int main(void) {
 		// glitch out for no apparent reason.
 		timer_1_Counter = 0;
 		timer++;*/
+		dbg_printf("%d\n", time_get_fps());
+		timer_1_Counter = 0;
 		timer++;
+
+		if(timer > 179)
+			timer = 0;
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));

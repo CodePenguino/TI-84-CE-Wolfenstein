@@ -12,8 +12,8 @@ CXXFLAGS = -Wall -Wextra -O3
 ifndef CEDEV
 # $(error CEDEV environment path variable is not set)
 # Swap this location to wherever you have CEDev installed
-CEDEV ?= ../CEdev
-#CEDEV ?= C:/CEdev
+#CEDEV ?= ../CEdev
+CEDEV ?= C:/CEdev
 endif
 
 include $(CEDEV)/meta/makefile.mk
@@ -21,4 +21,5 @@ include $(CEDEV)/meta/makefile.mk
 all: run
 
 run:
-	CEmu --launch ./bin/WOLF3D.bin --send ./bin/WOLF3D.8xp --fullscreen 1
+	C:/Users/Rodrigo\ Agras/Downloads/windows_CEmu/CEmu.exe --launch ./bin/WOLF3D.bin --send ./bin/WOLF3D.8xp --fullscreen 1
+#	CEmu --launch ./bin/WOLF3D.bin --send ./bin/WOLF3D.8xp --fullscreen 1
