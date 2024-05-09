@@ -7,9 +7,14 @@
 #include "util.h"
 //#include <string.h>
 #include <sys/timers.h>
+<<<<<<< HEAD
+=======
+//#include "benchmark.h"
+>>>>>>> 12291f6 (Adding SPI display scaling)
 #include "time.h"
 #include <debug.h>
 #include "math/math.h"
+#include "spi.h"
 
 // TODO: Have this map do literally anything
 const uint8_t map[64] = {
@@ -37,6 +42,8 @@ static inline void check_inputs(fixed24* x, fixed24* y) {
 }
 
 int main(void) {
+	// Calls _boot_InitializeHardware 
+	asm("call $000384");
 	// Clear homescreen and set up gfx api
 	os_ClrHome();
 	gfx_Begin();
@@ -54,29 +61,50 @@ int main(void) {
 	gfx_SetTextFGColor(224);
 
 	// Draw HUD once at the beginning (TODO: Draw texture instead)
+<<<<<<< HEAD
 	//gfx_SetColor(29);
 	//gfx_FillRectangle_NoClip(0, 180, 320, 60);
 	//gfx_PrintStringXY("Put menu here", 0, 180);
 	//gfx_SwapDraw();
 	//gfx_FillRectangle_NoClip(0, 180, 320, 60);
 	//gfx_PrintStringXY("Put menu here", 0, 180);
+=======
+	/*gfx_SetColor(29);
+	gfx_FillRectangle_NoClip(0, 180, 320, 60);
+	gfx_PrintStringXY("Put menu here", 0, 180);
+	gfx_SwapDraw();
+	gfx_FillRectangle_NoClip(0, 180, 320, 60);
+	gfx_PrintStringXY("Put menu here", 0, 180);*/
+>>>>>>> 12291f6 (Adding SPI display scaling)
 
 	time_enable();
+	set_scaled_mode();
 	//benchmark_enable();
 
 	gfx_SetTextBGColor(0);
 
-	dbg_ClearConsole();
+	//dbg_ClearConsole();
 
 	do {
 		key_update();
 		check_inputs(&x, &y);
 		gfx_ZeroScreen();
 
+<<<<<<< HEAD
 		for(uint8_t i = 158; i > 0; i--) {
 			_gfx_TexturedVertLine_Partial(i, 1260 - (timer)* 7, 180,
 				test_texture, texture_lut_u24[timer]);
 		}
+=======
+		gfx_SetColor(0xFA);
+		gfx_FillRectangle(0, 0, 100, 64);
+		
+		//for(uint24_t i = 158; i > 0; i--) {
+		//	uint24_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
+		//	uint24_t line_length = (120-sine_length)<<1;
+		//	gfx_TexturedVertLine(i, line_length, test_texture);
+		//}
+>>>>>>> 12291f6 (Adding SPI display scaling)
 
 		//gfx_VertLine_Scuffed(0, 90, 0xCF);
 

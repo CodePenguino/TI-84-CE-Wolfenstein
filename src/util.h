@@ -76,8 +76,13 @@ static inline void gfx_VertLine_Scuffed(uint24_t x, uint24_t length,
 static inline void gfx_TexturedVertLine(uint24_t x, uint24_t length,
 		const uint8_t* texture) {
 	if(length < 180) {
+<<<<<<< HEAD
 		// other_length = 180 - (2*((180-length)/2))
 		_gfx_TexturedVertLine_Partial(x, 1620 - (9*length), 180/*length*/,
+=======
+        // other_length = 180 - (2*((180-length)/2))
+		_gfx_TexturedVertLine_Partial(x, 1260 - (7*length), (length>>1)<<1,
+>>>>>>> 12291f6 (Adding SPI display scaling)
 			texture, texture_lut_u24[length]);
 	}
 	else {
