@@ -1,3 +1,4 @@
+#include <keypadc.h>
 #include <tice.h>
 #include <ti/screen.h>
 #include <graphx.h>
@@ -7,10 +8,6 @@
 #include "util.h"
 //#include <string.h>
 #include <sys/timers.h>
-<<<<<<< HEAD
-=======
-//#include "benchmark.h"
->>>>>>> 12291f6 (Adding SPI display scaling)
 #include "time.h"
 #include <debug.h>
 #include "math/math.h"
@@ -39,6 +36,8 @@ static inline void check_inputs(fixed24* x, fixed24* y) {
 		*y += 1;
 	if(key_pressed(kb_Up))
 		*y -= 1;
+	if(key_tapped(kb_2nd))
+		set_scaled_mode();
 }
 
 int main(void) {
@@ -51,35 +50,23 @@ int main(void) {
 
 	// Set up basic color palette
 	gfx_SetDefaultPalette(gfx_8bpp);
-	lcd_Control = (uint24_t)0x13925; // 4 bpp mode
-
 	gfx_SetTextScale(1, 1);
 
-	fixed24 x = 2, y = 15;
+	fixed24 x = 2, y = 170;
 	int timer = 0;
 
 	gfx_SetTextFGColor(224);
-
 	// Draw HUD once at the beginning (TODO: Draw texture instead)
-<<<<<<< HEAD
 	//gfx_SetColor(29);
 	//gfx_FillRectangle_NoClip(0, 180, 320, 60);
 	//gfx_PrintStringXY("Put menu here", 0, 180);
 	//gfx_SwapDraw();
 	//gfx_FillRectangle_NoClip(0, 180, 320, 60);
 	//gfx_PrintStringXY("Put menu here", 0, 180);
-=======
-	/*gfx_SetColor(29);
-	gfx_FillRectangle_NoClip(0, 180, 320, 60);
-	gfx_PrintStringXY("Put menu here", 0, 180);
-	gfx_SwapDraw();
-	gfx_FillRectangle_NoClip(0, 180, 320, 60);
-	gfx_PrintStringXY("Put menu here", 0, 180);*/
->>>>>>> 12291f6 (Adding SPI display scaling)
 
 	time_enable();
-	set_scaled_mode();
 	//benchmark_enable();
+	gfx_SetTextScale(1,2);
 
 	gfx_SetTextBGColor(0);
 
@@ -88,53 +75,22 @@ int main(void) {
 	do {
 		key_update();
 		check_inputs(&x, &y);
-		gfx_ZeroScreen();
+		//gfx_ZeroScreen();
 
-<<<<<<< HEAD
-		for(uint8_t i = 158; i > 0; i--) {
-			_gfx_TexturedVertLine_Partial(i, 1260 - (timer)* 7, 180,
-				test_texture, texture_lut_u24[timer]);
+		for(uint24_t i = 158; i > 0; i--) {
+			uint24_t line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
+			gfx_TexturedVertLine(i, line_length, test_texture);
 		}
-=======
-		gfx_SetColor(0xFA);
-		gfx_FillRectangle(0, 0, 100, 64);
-		
-		//for(uint24_t i = 158; i > 0; i--) {
-		//	uint24_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
-		//	uint24_t line_length = (120-sine_length)<<1;
-		//	gfx_TexturedVertLine(i, line_length, test_texture);
-		//}
->>>>>>> 12291f6 (Adding SPI display scaling)
 
-		//gfx_VertLine_Scuffed(0, 90, 0xCF);
-
-		// Apparently doing this is quicker than doing a normal for loop
-		//for(uint8_t i = 158; i > 0; i--) {
-			//gfx_VertLine_Scuffed(i, 90, 0xCF);
-		//}
-
-		/*for(uint24_t i = 2; i < 318; i+=2) {
-		  uint24_t sine_length = 120-((127+lu_sin(timer+(i*x)))>>3)-y;
-		  uint24_t line_length = (120-sine_length)<<1;
-		  gfx_TexturedVertLine(i, line_length, test_texture);
-		  }
-
-		  gfx_SetTextXY(0, 0);
-		  gfx_PrintUInt(time_get_fps(), 2);
-
-		// Idk why, but this (somewhat) fixes a weird bug where line graphics
-		// glitch out for no apparent reason.
-		timer_1_Counter = 0;
-		timer++;*/
-		dbg_printf("%d\n", time_get_fps());
+		//dbg_printf("%d\n", y);
+		//gfx_SetTextXY(0, 0);
+		//gfx_PrintUInt(time_get_fps(), 2);
+		//dbg_printf("%d\n", time_get_fps());
 		timer_1_Counter = 0;
 		timer++;
 
-		if(timer > 179)
-			timer = 0;
-
 		gfx_SwapDraw();
-	} while (!key_pressed(kb_2nd));
+	} while (!key_pressed(kb_Clear));
 
 	//benchmark_disable();
 	time_disable();

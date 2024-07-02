@@ -182,6 +182,7 @@ const uint24_t texture_lut_u24[180] = {
 	92,
 	92,
 	91,
+	91,
 };
 
 const uint8_t texture_lut_u8[204] = {

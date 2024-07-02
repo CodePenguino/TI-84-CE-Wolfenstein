@@ -37,16 +37,13 @@ __gfx_TexturedVertLine_Partial:
 	add hl,de              ; hl += de
 
 	ld  de,(iy+9)          ; de = otherLength
-<<<<<<< HEAD
-	ld  a,0xFF
-=======
+
 	ld  a,0xF1
->>>>>>> 12291f6 (Adding SPI display scaling)
 	;ld  bc,0xF1F1F1		; Uses a byte duplication trick to draw two pixels at once
 
 	ld  iy,drawVertLine
 	add iy,de
-	ld  de,ti.lcdWidth/2
+	ld  de,ti.lcdWidth
 
 	call __gfx_VertLine_NoClip
 	;; ld  c,(iy+6)           ; c = y
@@ -69,13 +66,9 @@ __gfx_TexturedVertLine_Partial:
 
 	ld  iy,drawVertTex
 	add iy,de
-<<<<<<< HEAD
-	ld  de,ti.lcdWidth/2   ; de = screen width - 1
-	ld  b,0                ; Don't return early
-=======
+
 	ld  de,ti.lcdWidth   ; de = screen width
 	ld  b,0
->>>>>>> 12291f6 (Adding SPI display scaling)
 
 	jp (iy)
 
@@ -105,7 +98,7 @@ drawFloor:
 
 	ld  iy,drawVertLine
 	add iy,de
-	ld  de,ti.lcdWidth/2
+	ld  de,ti.lcdWidth
 
 	jp (iy)
 
@@ -134,15 +127,9 @@ __gfx_TexturedVertLine_Full:
 	ld bc,(iy+12)
 	exx
 
-<<<<<<< HEAD
-	ld  de,ti.lcdWidth/2   ; de = screen width - 1
-	ld  b,1				   ; Used to return from drawVertTex early only if
-						   ; called from this function
-=======
 	ld  de,ti.lcdWidth   ; de = screen width
-	ld  b,1				   ; Used to return from drawVertTex early only if we're jumping from
-						   ; this function
->>>>>>> 12291f6 (Adding SPI display scaling)
+	ld  b,1				   ; Used to return from drawVertTex early only if 
+						   ; we're jumping from this function
 	jp drawVertTex
 
 	;; Draws a colored vertical line

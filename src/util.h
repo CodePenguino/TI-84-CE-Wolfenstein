@@ -32,8 +32,8 @@ extern void gfx_SetPixel2_NoClip(uint24_t x, uint8_t y, uint24_t c);
  * Draws a textured vertical line
  * @note Line is not clipped
  * @param[in] x X coordinate
- * @param[in] y Y coordinate
  * @param[in] length Length of the line
+ * @param[in] other_length Length of the ceiling/floor
  * @param[in] texture Pointer to the texture drawn
  * @param[in] delta Step size for each pixel (in fixed point)
  */
@@ -56,33 +56,12 @@ static inline void gfx_VertLine_Scuffed(uint24_t x, uint24_t length,
 	_gfx_VertLine_Scuffed(x, 180-(length<<1), color);
 }
 
-//static inline void gfx_VertLine_Scuffed(uint24_t x, uint24_t length,
-//        uint8_t color) {
-    // de = length
-    // bc = color
-    // iy = drawVertLine + length
-    /*length = 0;
-
-    asm("ld hl, (0E30000h+0014h)");
-    asm("ld bc, (%0)" :: "r" (&x));
-    asm("add hl, bc");
-
-    asm("ld de, (%0)" :: "r" (&length));
-    asm("ld bc, (%0)" :: "r" (&color));
-
-    _gfx_VertLine_NoClip();*/
-//}
-
+// Draw a vertical line on the screen
 static inline void gfx_TexturedVertLine(uint24_t x, uint24_t length,
 		const uint8_t* texture) {
 	if(length < 180) {
-<<<<<<< HEAD
 		// other_length = 180 - (2*((180-length)/2))
-		_gfx_TexturedVertLine_Partial(x, 1620 - (9*length), 180/*length*/,
-=======
-        // other_length = 180 - (2*((180-length)/2))
 		_gfx_TexturedVertLine_Partial(x, 1260 - (7*length), (length>>1)<<1,
->>>>>>> 12291f6 (Adding SPI display scaling)
 			texture, texture_lut_u24[length]);
 	}
 	else {
