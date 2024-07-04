@@ -43,7 +43,7 @@ __gfx_TexturedVertLine_Partial:
 
 	ld  iy,drawVertLine
 	add iy,de
-	ld  de,ti.lcdWidth
+	ld  de,ti.lcdWidth/2
 
 	call __gfx_VertLine_NoClip
 	;; ld  c,(iy+6)           ; c = y
@@ -67,7 +67,7 @@ __gfx_TexturedVertLine_Partial:
 	ld  iy,drawVertTex
 	add iy,de
 
-	ld  de,ti.lcdWidth   ; de = screen width
+	ld  de,ti.lcdWidth/2   ; de = screen width
 	ld  b,0
 
 	jp (iy)
@@ -98,7 +98,7 @@ drawFloor:
 
 	ld  iy,drawVertLine
 	add iy,de
-	ld  de,ti.lcdWidth
+	ld  de,ti.lcdWidth/2
 
 	jp (iy)
 
@@ -127,7 +127,7 @@ __gfx_TexturedVertLine_Full:
 	ld bc,(iy+12)
 	exx
 
-	ld  de,ti.lcdWidth   ; de = screen width
+	ld  de,ti.lcdWidth/2   ; de = screen width
 	ld  b,1				   ; Used to return from drawVertTex early only if 
 						   ; we're jumping from this function
 	jp drawVertTex

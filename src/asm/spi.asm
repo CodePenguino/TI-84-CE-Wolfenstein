@@ -3,155 +3,118 @@
 
 include 'ti84pceg.inc'
 
-; -----------------------------  Fuck you ---------------------------------
-; Calls a routine located in the archived appvar.
-; The 16-bit offset (plus 1) is stored at the return address.
-ArcCall:
-	ex (sp),hl
-	ld (ArcCallSMC),hl
-	inc hl
-	inc hl
-	ex (sp),hl
-ArcCallEntry:
-	push hl
-	push de
-ArcCallSMC = $+1
-	ld hl,(0)
-	dec.s hl
-ArcBase = $+1
-	ld de,0
-	add hl,de
-	pop de
-	ex (sp),hl
-	ret
+CurrentBuffer      := ti.mpLcdLpbase
 
-; Puts a pointer located in the archived appvar in HL.
-; The 16-bit offset (plus 1) is stored at the return address.
-ArcPtr:
-	pop hl
-	ld e,(hl)
-	inc hl
-	ld d,(hl)
-	inc hl
-	push hl
-	dec.s de
-	ld hl,(ArcBase)
-	add hl,de
-	ret
-
-macro ACALL address 
-	call ArcCall
-	dl address+1
+macro SPI_CMD cmd
+	ld a,cmd
+	call spiCmd
 end macro
 
-macro APTR address
-	call ArcPtr
-	dl address+1
+macro SPI_PARAM param
+	ld a,param
+	call spiParam
 end macro
-
-; macro SPI_PARAM param
-; 	db param
-; end macro
-
-; macro SPI_PARAM16 param
-; 	SPI_PARAM((param >> 8))
-; 	SPI_PARAM((param & $FF))
-; end macro
-
-; macro SPI_PARAM param
-; 	db ((param * SPI_BIT) >> 8) | (SPI_VALUE | SPI_BIT)
-; 	define SPI_VALUE eval((param * SPI_BIT) & $FF)
-; 	if SPI_BIT == $01
-; 		SPI_END
-; 		SPI_START
-; 	else
-; 		define SPI_BIT eval(SPI_BIT >> 1)
-; 	endif
-; end macro
-
-; macro SPI_PARAM16 param
-; 	SPI_PARAM(param >> 8)
-; 	SPI_PARAM(param & $FF)
-; end macro
-
-; macro SPI_START
-; 	define SPI_BIT $80
-; 	define SPI_VALUE $00
-; end macro
-
-; ; macro SPI_CMD cmd 
-; ; 	db ((cmd * SPI_BIT) >> 8) | SPI_VALUE
-; ; 	SPI_VALUE := ((cmd * SPI_BIT) & $FF)
-; ; 	if SPI_BIT == $01
-; ; 		SPI_END
-; ; 		SPI_START
-; ; 	else
-; ; 		SPI_BIT := (SPI_BIT >> 1)
-; ; 	endif
-; ; end macro
-
-; macro SPI_CMD cmd
-; 	db ((cmd * SPI_BIT) >> 8) | SPI_VALUE	
-; 	define SPI_VALUE eval((cmd * SPI_BIT) & $FF)
-; 	if SPI_BIT == $01
-; 		SPI_END
-; 		SPI_START
-; 	else
-; 		define SPI_BIT eval(SPI_BIT >> 1)
-; 	endif
-; end macro
-
-; macro SPI_END
-; 	if SPI_BIT != $80
-; 	db SPI_VALUE
-; 	endif
-; 	undefine SPI_VALUE
-; 	undefine SPI_BIT
-; end macro
-; -----------------------------  Fuck you ---------------------------------
 
 	public _set_scaled_mode
 _set_scaled_mode:
-	ld de,spiResetWindowAddress
-	ld b,spiDisableRamAccessSize
-	call spiFastTransfer
+	SPI_CMD $2A      ; X left/right bounds
+	SPI_PARAM 0
+	SPI_PARAM 0
+	SPI_PARAM 0
+	SPI_PARAM 159
 
-	; APTR(lcdSettings8BitStretched)
-	; ACALL(setLcdSettingsFirstBuffer)
-	
+	SPI_CMD $2B      ; Y up/down bounds
+	SPI_PARAM 0
+	SPI_PARAM 0
+	SPI_PARAM 0
+	SPI_PARAM 239
+
+	SPI_CMD $B0      ; RAM control vsync
+	SPI_PARAM $12
+
+	SPI_CMD $3A      ; RGB 16bpp
+	SPI_PARAM $56
+
+	SPI_CMD $33      ; Vertical scroll parameters
+	SPI_PARAM 0
+	SPI_PARAM 160    ;  Top fixed area
+	SPI_PARAM 0
+	SPI_PARAM 160    ;  Scrolling area
+	SPI_PARAM 0      ;  Bottom fixed area
+	SPI_PARAM 0
+
+	SPI_CMD $E4      ; Gate control
+	SPI_PARAM $27    ; 320 lines
+	SPI_PARAM $00    ; Start line 0
+	SPI_PARAM $14    ; Interlace
+	SPI_CMD $C6      ; Frame rate control
+	SPI_PARAM 9      ; 394 clocks per line
+	SPI_CMD $B2      ; Porch control
+	SPI_PARAM 87     ; Back porch
+	SPI_PARAM 1      ; Front porch
+
+	; Set lcd settings...
+	call lcdWriteTimings
+
 	ret
 
-; Functions...
-spiFastTransfer:
-	ld hl,$F80008	; mpSpiTransfer
-	ld (hl),1		; Activate the SPI chip select signal
-	; Fill SPI FIFO and transfer at the same time
-	ld l,$18		; mpSpiFifo & $FF
-taxEvasion:
-	ld a,(de)
-	ld (hl),a
-	inc de
-	djnz taxEvasion
-	; Wait for transfer to complete
-	ld l,$0C		; mpSpiStatus & $FF
-taxEvasion2:		; Electric boogaloo!
+; All this code copy-pasted from this: https://wikiti.brandonw.net/index.php?title=84PCE:Ports:D000
+; Input: A = parameter
+spiParam:
+	scf ; First bit is set for data
+	db 030h ; jr nc,? ; skips over one byte
+	; Input: A = command
+spiCmd:
+	or a,a ; First bit is clear for commands
+	ld hl,0F80818h
+	call spiWrite
+	ld l,h
+	ld (hl),001h
+spiWait:
+	ld l,00Dh
+spiWait1:
+	ld a,(hl)
+	and a,0F0h
+	jr nz,spiWait1
+	dec l
+spiWait2:
 	bit 2,(hl)
-	jr nz,taxEvasion2
-	; Disable transfer, discarding excess bits sent to LCD
-	ld l,$08		;mpSpiTransfer & $FF
-	ld (hl),b
+	jr nz,spiWait2
+	ld l,h
+	ld (hl),a
+	ret
+spiWrite:
+	ld b,3
+spiWriteLoop:
+	rla
+	rla
+	rla
+	ld (hl),a ; send 3 bits
+	djnz spiWriteLoop
 	ret
 
+; If you just stretch the screen with the SPI, it leaves gaps for every
+; vertical scan lines. Setting the lcd to another mode fixes this...
+lcdWriteTimings:
+	ld hl,lcdSettings8BitStretched ; hl = lcd setting
+	ld de,$E30000                  ; de = lcd_Timing0 memory address
+	ld bc,12                       ; bc = number of bites in the setting
+	ldir
+	ret
 
 ; Arrays...
-spiResetWindowAddress:
-	db 88	; SPI_CMD(0xb0)
-	db 64	; SPI_PARAM(0x2)
-	db 190	; SPI_PARAM(0xf0)
-spiDisableRamAccessSize = $+1 - spiResetWindowAddress
-	db 2	; SPI_CMD(0x2c)
-	db 197	; SPI_CMD(0xb0)
-	db 132	; SPI_PARAM(0x12)
-	db 75	; SPI_PARAM(0xf0)
-	db 224	; SPI_END
-spiResetWindowAddressSize = $ - spiResetWindowAddress
+lcdSettings8BitStretched:
+	; LcdTiming0
+	db $C4,$03,$1D,$1F ; PPL=800, HSW=4, HBP=32, HFP=30 (total=866)
+	; LcdTiming1
+	db $2F,$00,$B7,$00 ; LPP=48, VSW=1, VBP=0, VFP=183 (total=232)
+	; LcdTiming2
+	db $00,$78,$1F,$03 ; PCD=2, CPL=800
+
+lcdSettingsDefault:
+	; LcdTiming0
+	db $1F,$0A,$03,$38
+	; LcdTiming1
+	db $04,$02,$09,$3F
+	; LcdTiming2
+	db $00,$EF,$78,$02

@@ -15,6 +15,7 @@ SPI_VALUE = 0x00
 def SPI_START():
 	SPI_BIT = 0x80
 	SPI_VALUE = 0x00
+	list_arguments.append("		; SPI_START")
 
 def SPI_END():
 	if SPI_BIT != 0x80:
@@ -51,13 +52,25 @@ def SPI_CMD(cmd):
 
 # Code that is converted to assembly...
 SPI_START()
-SPI_CMD(0xB0)
-SPI_PARAM(0x02)
-SPI_PARAM(0xF0)
-SPI_CMD(0x2C)
+SPI_CMD(0x2A) 
+SPI_PARAM16(0) 
+SPI_PARAM16(159)
+SPI_CMD(0x2B)
+SPI_PARAM16(0)
+SPI_PARAM16(239)
 SPI_CMD(0xB0)
 SPI_PARAM(0x12)
 SPI_PARAM(0xF0)
+SPI_CMD(0x33)     
+SPI_PARAM16(0)   
+SPI_PARAM16(160) 
+SPI_PARAM16(160) 
+SPI_CMD(0x37)     
+SPI_PARAM16(320) 
+SPI_CMD(0xE4)     
+SPI_PARAM(0x27)   
+SPI_PARAM(0x00)   
+SPI_PARAM(0x14)   
 SPI_END()
 
 # Writes all of the code onto the file output ---------

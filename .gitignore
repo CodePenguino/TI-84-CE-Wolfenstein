@@ -3,3 +3,4 @@ lib
 .cache
 .ccls-cache
 .ccls
+bin

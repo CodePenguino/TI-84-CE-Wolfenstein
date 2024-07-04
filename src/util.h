@@ -57,7 +57,7 @@ static inline void gfx_VertLine_Scuffed(uint24_t x, uint24_t length,
 }
 
 // Draw a vertical line on the screen
-static inline void gfx_TexturedVertLine(uint24_t x, uint24_t length,
+static inline void gfx_TexturedVertLine(uint8_t x, uint24_t length,
 		const uint8_t* texture) {
 	if(length < 180) {
 		// other_length = 180 - (2*((180-length)/2))

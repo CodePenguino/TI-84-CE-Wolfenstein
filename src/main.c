@@ -36,8 +36,6 @@ static inline void check_inputs(fixed24* x, fixed24* y) {
 		*y += 1;
 	if(key_pressed(kb_Up))
 		*y -= 1;
-	if(key_tapped(kb_2nd))
-		set_scaled_mode();
 }
 
 int main(void) {
@@ -67,17 +65,15 @@ int main(void) {
 	time_enable();
 	//benchmark_enable();
 	gfx_SetTextScale(1,2);
-
 	gfx_SetTextBGColor(0);
-
-	//dbg_ClearConsole();
+	set_scaled_mode();
 
 	do {
 		key_update();
 		check_inputs(&x, &y);
 		//gfx_ZeroScreen();
 
-		for(uint24_t i = 158; i > 0; i--) {
+		for(uint8_t i = 159; i > 0; i--) {
 			uint24_t line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
 			gfx_TexturedVertLine(i, line_length, test_texture);
 		}
@@ -94,6 +90,9 @@ int main(void) {
 
 	//benchmark_disable();
 	time_disable();
+
+	// Reset the SPI to how it was before the program was run
+	asm("call $000384");
 
 	// Clear memory and gfx api (otherwise you get corrupted graphics)
 	gfx_End();
