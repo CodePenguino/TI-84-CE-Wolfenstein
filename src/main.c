@@ -39,7 +39,7 @@ static inline void check_inputs(fixed24* x, fixed24* y) {
 }
 
 int main(void) {
-	// Calls _boot_InitializeHardware 
+	// Calls _boot_InitializeHardware
 	asm("call $000384");
 	// Clear homescreen and set up gfx api
 	os_ClrHome();
@@ -51,11 +51,10 @@ int main(void) {
 	gfx_SetTextScale(1, 1);
 
 	fixed24 x = 2, y = 170;
-	int timer = 0;
+	uint8_t timer = 0;
 
-	gfx_SetTextFGColor(224);
+	//gfx_SetTextFGColor(224);
 	// Draw HUD once at the beginning (TODO: Draw texture instead)
-	//gfx_SetColor(29);
 	//gfx_FillRectangle_NoClip(0, 180, 320, 60);
 	//gfx_PrintStringXY("Put menu here", 0, 180);
 	//gfx_SwapDraw();
@@ -64,16 +63,17 @@ int main(void) {
 
 	time_enable();
 	//benchmark_enable();
-	gfx_SetTextScale(1,2);
-	gfx_SetTextBGColor(0);
+	//gfx_SetTextScale(1,2);
+	//gfx_SetTextBGColor(0);
 	set_scaled_mode();
+	set_lcd_mode();
 
 	do {
 		key_update();
 		check_inputs(&x, &y);
 		//gfx_ZeroScreen();
 
-		for(uint8_t i = 159; i > 0; i--) {
+		for(uint8_t i = 158; i > 0; i--) {
 			uint24_t line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
 			gfx_TexturedVertLine(i, line_length, test_texture);
 		}

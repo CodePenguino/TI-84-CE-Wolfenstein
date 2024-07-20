@@ -1,5 +1,17 @@
 	assume adl=1
-	section .rodata
+	
+section .rodata
+
+	public _lcd_settings
+_lcd_settings:
+	; LcdTiming0
+	db $60,$01,$0E,$0F ; PPL=400, HSW=2, HBP=16, HFP=15 (total=433)
+	; LcdTiming1
+	db $5F,$00,$FF,$70 ; LPP=96, VSW=1, VBP=112, VFP=255 (total=464)
+	; LcdTiming2
+	db $00,$78,$8F,$01 ; PCD=2, CPL=400
+	
+section .text
 
 include 'ti84pceg.inc'
 
@@ -44,7 +56,7 @@ _set_scaled_mode:
 	SPI_PARAM 0
 
 	SPI_CMD $E4      ; Gate control
-	SPI_PARAM $27    ; 320 lines
+	SPI_PARAM $13    ; 320 lines
 	SPI_PARAM $00    ; Start line 0
 	SPI_PARAM $14    ; Interlace
 	SPI_CMD $C6      ; Frame rate control
@@ -54,7 +66,7 @@ _set_scaled_mode:
 	SPI_PARAM 1      ; Front porch
 
 	; Set lcd settings...
-	call lcdWriteTimings
+	; call lcdWriteTimings
 
 	ret
 
@@ -92,29 +104,3 @@ spiWriteLoop:
 	ld (hl),a ; send 3 bits
 	djnz spiWriteLoop
 	ret
-
-; If you just stretch the screen with the SPI, it leaves gaps for every
-; vertical scan lines. Setting the lcd to another mode fixes this...
-lcdWriteTimings:
-	ld hl,lcdSettings8BitStretched ; hl = lcd setting
-	ld de,$E30000                  ; de = lcd_Timing0 memory address
-	ld bc,12                       ; bc = number of bites in the setting
-	ldir
-	ret
-
-; Arrays...
-lcdSettings8BitStretched:
-	; LcdTiming0
-	db $C4,$03,$1D,$1F ; PPL=800, HSW=4, HBP=32, HFP=30 (total=866)
-	; LcdTiming1
-	db $2F,$00,$B7,$00 ; LPP=48, VSW=1, VBP=0, VFP=183 (total=232)
-	; LcdTiming2
-	db $00,$78,$1F,$03 ; PCD=2, CPL=800
-
-lcdSettingsDefault:
-	; LcdTiming0
-	db $1F,$0A,$03,$38
-	; LcdTiming1
-	db $04,$02,$09,$3F
-	; LcdTiming2
-	db $00,$EF,$78,$02
