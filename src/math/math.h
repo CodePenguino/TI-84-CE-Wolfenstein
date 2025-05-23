@@ -38,7 +38,7 @@ static inline int8_t lu_sin(uint8_t x) {
 static inline int8_t lu_cos(uint8_t x) {
 	// Load x variable into the a register
 	asm("ld a, %0" :: "r" (x));
-	// Add 64 to the a register; cos(x) = 64 + sin(x) (assuming there's 256 total angles...)
+	// Add 64 to the a register; cos(x) = sin(x + 64) (assuming there's 256 total angles...)
 	asm("add a, 64");
 	return _getSinCos();
 }
