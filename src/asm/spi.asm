@@ -1,5 +1,5 @@
 	assume adl=1
-	
+
 section .rodata
 
 	public _lcd_settings
@@ -10,7 +10,7 @@ _lcd_settings:
 	db $5F,$00,$FF,$70 ; LPP=96, VSW=1, VBP=112, VFP=255 (total=464)
 	; LcdTiming2
 	db $00,$78,$8F,$01 ; PCD=2, CPL=400
-	
+
 section .text
 
 include 'ti84pceg.inc'
@@ -26,6 +26,14 @@ macro SPI_PARAM param
 	ld a,param
 	call spiParam
 end macro
+
+;macro SPI_PARAM16 param
+	;ld a, param >> 8
+	;call spiParam
+
+	;ld a, param & $FF
+	;call spiParam
+;end macro
 
 	public _set_scaled_mode
 _set_scaled_mode:
@@ -43,30 +51,26 @@ _set_scaled_mode:
 
 	SPI_CMD $B0      ; RAM control vsync
 	SPI_PARAM $12
+	SPI_PARAM $F0
 
 	SPI_CMD $3A      ; RGB 16bpp
 	SPI_PARAM $56
 
 	SPI_CMD $33      ; Vertical scroll parameters
+	SPI_PARAM 0		 ; Top fixed area
+	SPI_PARAM 160
+	SPI_PARAM 0		 ; Scrolling area
+	SPI_PARAM 160
+	SPI_PARAM 0      ; Bottom fixed area
 	SPI_PARAM 0
-	SPI_PARAM 160    ;  Top fixed area
-	SPI_PARAM 0
-	SPI_PARAM 160    ;  Scrolling area
-	SPI_PARAM 0      ;  Bottom fixed area
+
+	SPI_CMD $37		 ; Vertical scroll start address
 	SPI_PARAM 0
 
 	SPI_CMD $E4      ; Gate control
-	SPI_PARAM $13    ; 320 lines
+	SPI_PARAM $27    ; 320 lines
 	SPI_PARAM $00    ; Start line 0
-	SPI_PARAM $14    ; Interlace
-	SPI_CMD $C6      ; Frame rate control
-	SPI_PARAM 9      ; 394 clocks per line
-	SPI_CMD $B2      ; Porch control
-	SPI_PARAM 87     ; Back porch
-	SPI_PARAM 1      ; Front porch
-
-	; Set lcd settings...
-	; call lcdWriteTimings
+	SPI_PARAM $14    ; No interlacing
 
 	ret
 

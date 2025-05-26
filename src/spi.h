@@ -18,19 +18,6 @@
 extern "C" {
 #endif
 extern void set_scaled_mode();
-extern uint8_t lcd_settings[];
 #ifdef __cplusplus
 }
 #endif
-
-static inline void set_lcd_mode()
-{
-
-	//lcd_Timing0 = 0b00011111000010100000001100111000;
-	//lcd_Timing0 = 0b00011111000010100000000100111000;
-	//lcd_Timing1 = 0b00000100000000100000100010011111;
-	//lcd_Timing2 = 0x031F7800;
-
-
-	//lcd_Control = (uint24_t)0x013C27;
-}

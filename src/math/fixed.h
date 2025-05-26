@@ -12,8 +12,6 @@ typedef int24_t fixed24;
 
 #define FIX_ONE         FIX_SCALE
 
-// TODO: Maybe change to assembly instructions? ¯\_(ツ)_/¯
-
 // Convert int to fixed24
 #define int2fx(x) (fixed24)(x << FIX_SHIFT)
 // Convert float to fixed24

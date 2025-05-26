@@ -1,9 +1,8 @@
-  assume adl=0
+  assume adl=1
   section .text
 
 public __fx2uint
 __fx2uint:
-	; Load required variables
 	ld  iy,0
 	add iy,sp
 

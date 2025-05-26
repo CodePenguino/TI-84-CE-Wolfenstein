@@ -1,6 +1,7 @@
 include
 lib
+bin
+obj
 .cache
 .ccls-cache
 .ccls
-bin

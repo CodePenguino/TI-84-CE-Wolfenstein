@@ -1,7 +1,7 @@
 NAME = WOLF3D
 ICON = icon.png
-DESCRIPTION = "Woflenstein raycaster for the Ti84 Plus CE by Rodrigo Agras"
-COMPRESSED = NO
+DESCRIPTION = "Wolfenstein raycaster for the Ti84 Plus CE by Rodrigo Agras"
+COMPRESSED = YES
 ARCHIVED = NO
 
 CFLAGS = -Wall -Wextra -Oz
@@ -22,4 +22,4 @@ all: run
 
 run:
 #	C:/Users/Rodrigo\ Agras/Downloads/windows_CEmu/CEmu.exe --launch ./bin/WOLF3D.bin --send ./bin/WOLF3D.8xp --fullscreen 1
-	CEmu --launch ./bin/WOLF3D.bin --send ./bin/WOLF3D.8xp ../CEmu/clibs-nightly.8xg --fullscreen 1
+	CEmu --launch ./bin/WOLF3D.bin --send ./bin/WOLF3D.8xp ../CEmu/clibs.8xg --fullscreen 1

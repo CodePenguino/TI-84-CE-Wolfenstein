@@ -19,7 +19,7 @@ static inline void benchmark_disable()
 	timer_Disable(BENCHMARK_TIMER);
 }
 
-static inline uint24_t benchmark_get_time()
+static inline uint32_t benchmark_get_time()
 {
 	return timer_GetSafe(BENCHMARK_TIMER, TIMER_UP);
 }

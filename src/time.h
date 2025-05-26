@@ -13,12 +13,12 @@ static inline void time_disable() {
 	timer_Disable(SYSTEM_TIMER);
 }
 
-static inline uint24_t time_get() {
+static inline uint32_t time_get() {
 	return timer_GetSafe(SYSTEM_TIMER, TIMER_UP);
 }
 
 //#define time_get_fps() (32768 / time_get())
 
-static inline uint24_t time_get_fps() {
+static inline uint32_t time_get_fps() {
 	return 32768 / time_get();
 }
