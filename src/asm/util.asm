@@ -19,9 +19,8 @@ _gfx_SetPixel2_NoClip:
 	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
 	mlt bc                 ; bc = b * c (y * 160)
 	add hl,bc
-	add hl,bc
-	ld  de,(iy+9)          ; de = c
-	ld	(hl),de            ; set the pixel color
+	ld  a,(iy+9)          ; a = c
+	ld	(hl),a            ; set the pixel color
 	ret
 
 

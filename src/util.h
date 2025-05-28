@@ -10,12 +10,12 @@ extern "C" {
 
 /**
  * Sets a color pixel with duplication trick potential
- * @note Pixel is not clipped at all and allows for horizontal duplication trick
+ * @note Pixel is not clipped at all
  * @param[in] x X coordinate
  * @param[in] y Y coordinate
  * @param[in] c Color
  */
-extern void gfx_SetPixel2_NoClip(uint24_t x, uint8_t y, uint24_t c);
+extern void gfx_SetPixel2_NoClip(uint8_t x, uint8_t y, uint8_t c);
 
 /**
  * Draws a flatly colored vertical line with duplication trick potential

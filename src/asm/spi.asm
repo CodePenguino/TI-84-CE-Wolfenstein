@@ -1,21 +1,7 @@
 	assume adl=1
-
-section .rodata
-
-	public _lcd_settings
-_lcd_settings:
-	; LcdTiming0
-	db $60,$01,$0E,$0F ; PPL=400, HSW=2, HBP=16, HFP=15 (total=433)
-	; LcdTiming1
-	db $5F,$00,$FF,$70 ; LPP=96, VSW=1, VBP=112, VFP=255 (total=464)
-	; LcdTiming2
-	db $00,$78,$8F,$01 ; PCD=2, CPL=400
-
 section .text
 
 include 'ti84pceg.inc'
-
-CurrentBuffer      := ti.mpLcdLpbase
 
 macro SPI_CMD cmd
 	ld a,cmd
@@ -70,7 +56,7 @@ _set_scaled_mode:
 	SPI_CMD $E4      ; Gate control
 	SPI_PARAM $27    ; 320 lines
 	SPI_PARAM $00    ; Start line 0
-	SPI_PARAM $14    ; No interlacing
+	SPI_PARAM $14    ; Interlaced
 
 	ret
 

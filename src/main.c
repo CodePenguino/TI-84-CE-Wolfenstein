@@ -7,6 +7,7 @@
 #include "util.h"
 #include <sys/timers.h>
 #include "time.h"
+#include "math/math.h"
 #include <debug.h>
 #include "spi.h"
 #include <sys/lcd.h>
@@ -48,25 +49,31 @@ int main(void) {
 	gfx_SetDefaultPalette(gfx_8bpp);
 
 	fixed24 x = 2, y = 170;
-	//uint8_t timer = 0;
+	uint8_t timer = 0;
 
 	time_enable();
 	set_scaled_mode();
+	gfx_FillScreen(29);
+	gfx_SwapDraw();
+	gfx_FillScreen(29);
+	gfx_SwapDraw();
 
 	do {
 		key_update();
 		check_inputs(&x, &y);
 
 		for(uint8_t i = 158; i > 0; --i) {
-			//uint24_t line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
-			gfx_TexturedVertLine(i, y, test_texture);
+			uint24_t line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
+			gfx_TexturedVertLine(i, line_length, test_texture);
 		}
+		gfx_SetPixel2_NoClip(1, 1, 0);
 
 		dbg_printf("%lu\n", time_get_fps());
 		timer_1_Counter = 0;
+		timer++;
 
 		gfx_SwapDraw();
-	} while (!key_pressed(kb_Clear));
+	} while (!key_pressed(kb_2nd));
 
 	//benchmark_disable();
 	time_disable();
