@@ -53,20 +53,22 @@ int main(void) {
 
 	time_enable();
 	set_scaled_mode();
+
+	// Draw blue border
 	gfx_FillScreen(29);
 	gfx_SwapDraw();
 	gfx_FillScreen(29);
-	gfx_SwapDraw();
 
 	do {
 		key_update();
 		check_inputs(&x, &y);
 
+		uint24_t line_length;
+
 		for(uint8_t i = 158; i > 0; --i) {
-			uint24_t line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
+			line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
 			gfx_TexturedVertLine(i, line_length, test_texture);
 		}
-		gfx_SetPixel2_NoClip(1, 1, 0);
 
 		dbg_printf("%lu\n", time_get_fps());
 		timer_1_Counter = 0;

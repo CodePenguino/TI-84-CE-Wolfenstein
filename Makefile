@@ -1,6 +1,6 @@
 NAME = WOLF3D
 ICON = icon.png
-DESCRIPTION = "Wolfenstein raycaster for the Ti84 Plus CE by Rodrigo Agras"
+DESCRIPTION = "Wolfenstein raycaster by Rodrigo Agras"
 COMPRESSED = YES
 ARCHIVED = NO
 
