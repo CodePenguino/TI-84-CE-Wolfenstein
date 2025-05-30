@@ -12,7 +12,8 @@
 
 // Most of the code is modified from calc86maniac's source code for tiboyce
 // https://github.com/calc84maniac/tiboyce/blob/cc5a1fac6fc4840e1483fc6a38c48aff2143549a/setup.asm#L4245
-// Basically the only difference is how the spi params and cmds are set...
+// Basically the only difference is how the spi params and cmds are set and
+// some emulation-specific settings...
 #ifdef __cplusplus
 extern "C" {
 #endif
