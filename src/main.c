@@ -4,13 +4,13 @@
 #include <graphx.h>
 #include "input.h"
 #include "math/fixed.h"
-#include "util.h"
+#include "gfx/renderer.h"
 #include <sys/timers.h>
 #include "time.h"
 #include "math/math.h"
 #include <debug.h>
-#include "spi.h"
-#include <sys/lcd.h>
+#include "gfx/spi.h"
+#include "gfx/palette.h"
 
 // TODO: Have this map do literally anything
 const uint8_t map[64] = {
@@ -47,6 +47,7 @@ int main(void) {
 
 	// Set up basic color palette
 	gfx_SetDefaultPalette(gfx_8bpp);
+	gfx_SetPalette(wolf_palette, sizeof(wolf_palette), 0);
 
 	fixed24 x = 2, y = 170;
 	uint8_t timer = 0;
@@ -55,9 +56,9 @@ int main(void) {
 	set_scaled_mode();
 
 	// Draw blue border
-	gfx_FillScreen(29);
+	gfx_FillScreen(0);
 	gfx_SwapDraw();
-	gfx_FillScreen(29);
+	gfx_FillScreen(0);
 
 	do {
 		key_update();
