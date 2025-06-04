@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include "lut/linestep.h"
-//include "math/fixed.h"
+#include "math/fixed.h"
 
 #ifdef __cplusplus
 extern "C" {

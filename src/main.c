@@ -10,7 +10,8 @@
 #include "math/math.h"
 #include <debug.h>
 #include "gfx/spi.h"
-#include "gfx/palette.h"
+#include "gfx/global_palette.h"
+#include "gfx/door_texture.h"
 
 // TODO: Have this map do literally anything
 const uint8_t map[64] = {
@@ -23,8 +24,6 @@ const uint8_t map[64] = {
 	1,0,0,0,0,0,0,1,
 	1,1,1,1,1,1,1,1,
 };
-
-extern uint8_t test_texture[];
 
 static inline void check_inputs(fixed24* x, fixed24* y) {
 	if(key_pressed(kb_Right))
@@ -45,9 +44,9 @@ int main(void) {
 	gfx_Begin();
 	gfx_SetDrawScreen();
 
-	// Set up basic color palette
-	gfx_SetDefaultPalette(gfx_8bpp);
-	gfx_SetPalette(wolf_palette, sizeof(wolf_palette), 0);
+	// Set up wolfenstein color palette
+	//gfx_SetDefaultPalette(gfx_8bpp);
+	gfx_SetPalette(global_palette, sizeof(global_palette), 0);
 
 	fixed24 x = 2, y = 170;
 	uint8_t timer = 0;
@@ -56,19 +55,19 @@ int main(void) {
 	set_scaled_mode();
 
 	// Draw blue border
-	gfx_FillScreen(0);
-	gfx_SwapDraw();
-	gfx_FillScreen(0);
+	//gfx_FillScreen(0);
+	//gfx_SwapDraw();
+	//gfx_FillScreen(0);
+
+	uint24_t line_length = 0;
 
 	do {
 		key_update();
 		check_inputs(&x, &y);
 
-		uint24_t line_length;
-
-		for(uint8_t i = 158; i > 0; --i) {
-			line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
-			gfx_TexturedVertLine(i, line_length, test_texture);
+		for(uint8_t i = 0; i <= 159; i++) {
+			//line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
+			gfx_TexturedVertLine(i, y, door_texture_data + (i<<6));
 		}
 
 		dbg_printf("%lu\n", time_get_fps());
