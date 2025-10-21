@@ -136,7 +136,7 @@ __gfx_TexturedVertLine_Full:
 __gfx_VertLine_NoClip:
 	jp (iy)
 
-	; This is fucked on so many levels...
+	; Same unrolled loop trick as used for the textured line
 drawVertLine:
 repeat 90
 	ld (hl),a
