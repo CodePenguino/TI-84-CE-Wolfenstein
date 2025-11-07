@@ -1,14 +1,14 @@
 [
  {
-  "directory": "/home/cpu/Dev/TI-84/TI-84-CE-Wolfenstein",
+  "directory": "/home/cpu/Dev/TI-84-CE-Wolfenstein",
   "arguments": [
-   "/home/cpu/Dev/TI-84/CEdev/bin/ez80-clang",
+   "../CEdev/bin/ez80-clang",
    "-MD",
    "-c",
    "-emit-llvm",
    "-nostdinc",
    "-isystem",
-   "/home/cpu/Dev/TI-84/CEdev/include",
+   "../CEdev/include",
    "-Isrc",
    "-fno-threadsafe-statics",
    "-Xclang",

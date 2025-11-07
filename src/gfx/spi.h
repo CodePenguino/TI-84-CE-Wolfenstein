@@ -3,8 +3,7 @@
 #include <sys/lcd.h>
 
 // Rendering things on the screen is pretty time-consuming, so in order to
-// speed things up, this halves the resolution using some SPI magical-address
-// fuckery
+// speed things up, this halves the resolution using some SPI magical-address tricks
 
 // The SPI is a piece of hardware that controls how things are displayed on
 // the screen. There currently aren't any C functions to control it on the

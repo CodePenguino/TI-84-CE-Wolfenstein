@@ -66,8 +66,8 @@ int main(void) {
 		check_inputs(&x, &y);
 
 		for(uint8_t i = 0; i <= 159; i++) {
-			//line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
-			gfx_TexturedVertLine(i, y, door_texture_data + (i<<6));
+			line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
+			gfx_TexturedVertLine(i, line_length, door_texture_data + (i<<6));
 		}
 
 		dbg_printf("%lu\n", time_get_fps());
