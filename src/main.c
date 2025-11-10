@@ -1,4 +1,6 @@
 #include <keypadc.h>
+#include <stdint.h>
+#include <string.h>
 #include <tice.h>
 #include <ti/screen.h>
 #include <graphx.h>
@@ -10,8 +12,7 @@
 #include "math/math.h"
 #include <debug.h>
 #include "gfx/spi.h"
-#include "gfx/global_palette.h"
-#include "gfx/door_texture.h"
+#include "gfx/gfx.h"
 
 // TODO: Have this map do literally anything
 const uint8_t map[64] = {
@@ -55,22 +56,29 @@ int main(void) {
 	set_scaled_mode();
 
 	// Draw blue border
-	//gfx_FillScreen(0);
-	//gfx_SwapDraw();
-	//gfx_FillScreen(0);
+	gfx_FillScreen(6);
+	gfx_SwapDraw();
+	gfx_FillScreen(6);
 
 	uint24_t line_length = 0;
+
+	// Aligns texture data so last 8 bits are all 0 (fixes alignment bug)
+	uint8_t* full_data = malloc(4096 + 256);
+	uintptr_t offset = 256 - ((uintptr_t)full_data % 256);
+	memcpy((void*)(full_data + offset), door_texture_data, sizeof(door_texture_data));
+	uint8_t* data = (uint8_t*)(full_data+offset);
 
 	do {
 		key_update();
 		check_inputs(&x, &y);
 
+		gfx_Wait();
 		for(uint8_t i = 0; i <= 159; i++) {
 			line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
-			gfx_TexturedVertLine(i, line_length, door_texture_data + (i<<6));
+			gfx_TexturedVertLine(i, line_length, data + (i<<6));
 		}
 
-		dbg_printf("%lu\n", time_get_fps());
+		//dbg_printf("%lu\n", time_get_fps());
 		timer_1_Counter = 0;
 		timer++;
 
@@ -79,6 +87,8 @@ int main(void) {
 
 	//benchmark_disable();
 	time_disable();
+
+	free(data);
 
 	// Reset the SPI to how it was before the program was run
 	asm("call $000384");
