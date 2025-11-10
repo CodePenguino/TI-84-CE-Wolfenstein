@@ -75,7 +75,7 @@ int main(void) {
 		gfx_Wait();
 		for(uint8_t i = 0; i <= 159; i++) {
 			line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
-			gfx_TexturedVertLine(i, line_length, data + (i<<6));
+			gfx_TexturedVertLine(i, line_length, data + (i<<6) % 4096);
 		}
 
 		//dbg_printf("%lu\n", time_get_fps());
