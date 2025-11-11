@@ -21,4 +21,4 @@ include $(CEDEV)/meta/makefile.mk
 all: run
 
 run:
-	CEmu --launch ./bin/WOLF3D.bin --send ./bin/WOLF3D.8xp ../CEmu/clibs.8xg --fullscreen 1
+	CEmu --launch ./bin/WOLF3D.bin --send ./bin/WOLF3D.8xp ../clibs.8xg --no-reset
