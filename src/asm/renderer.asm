@@ -1,5 +1,5 @@
 assume adl=1
-	include 'ti84pceg.inc'
+include 'ti84pceg.inc'
 
 LcdSize            := ti.lcdWidth*ti.lcdHeight
 CurrentBuffer      := ti.mpLcdLpbase
@@ -19,8 +19,8 @@ _gfx_SetPixel2_NoClip:
 	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
 	mlt bc                 ; bc = b * c (y * 160)
 	add hl,bc
-	ld  a,(iy+9)          ; a = c
-	ld	(hl),a            ; set the pixel color
+	ld  a,(iy+9)           ; a = c
+	ld	(hl),a             ; set the pixel color
 	ret
 
 
@@ -35,7 +35,7 @@ __gfx_TexturedVertLine_Partial:
 	ld  de,(iy+3)          ; de = x
 	add hl,de              ; hl += de
 
-	ld  a,0xF1		; Sets ceiling color
+	ld  a,0xF1             ; Sets ceiling color
 
 	ld  de,(iy+9)          ; de = otherLength
 
@@ -61,7 +61,7 @@ __gfx_TexturedVertLine_Partial:
 	ld  bc,(iy+15)         ; bc' = delta (fixed point)
 	exx
 
-	ld  de,(iy+6)			; de = length
+	ld  de,(iy+6)          ; de = length
 
 	ld  iy,drawVertTex
 	add iy,de
@@ -72,7 +72,7 @@ __gfx_TexturedVertLine_Partial:
 	jp (iy)
 
 drawVertTex:
-repeat 180               ; Kids, SERIOUSLY don't try this at home...
+repeat 180                 ; Kids, SERIOUSLY don't try this at home...
 	exx
 	add hl,bc
 	ld  e,h
