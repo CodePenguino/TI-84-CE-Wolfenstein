@@ -12,7 +12,6 @@
 #include "math/math.h"
 #include <debug.h>
 #include "gfx/spi.h"
-#include "gfx/gfx.h"
 #include "gfx/texture.h"
 
 // TODO: Have this map do literally anything
