@@ -1,6 +1,5 @@
 #include <keypadc.h>
 #include <stdint.h>
-#include <string.h>
 #include <tice.h>
 #include <ti/screen.h>
 #include <graphx.h>
