@@ -13,6 +13,7 @@
 #include <debug.h>
 #include "gfx/spi.h"
 #include "gfx/gfx.h"
+#include "gfx/texture.h"
 
 // TODO: Have this map do literally anything
 const uint8_t map[64] = {
@@ -46,13 +47,13 @@ int main(void) {
 	gfx_SetDrawScreen();
 
 	// Set up wolfenstein color palette
-	//gfx_SetDefaultPalette(gfx_8bpp);
 	gfx_SetPalette(global_palette, sizeof(global_palette), 0);
 
 	fixed24 x = 2, y = 170;
 	uint8_t timer = 0;
 
 	time_enable();
+	texture_init();
 	set_scaled_mode();
 
 	// Draw blue border
@@ -62,12 +63,6 @@ int main(void) {
 
 	uint24_t line_length = 0;
 
-	// Aligns texture data so last 8 bits are all 0 (fixes alignment bug)
-	uint8_t* full_data = malloc(4096 + 256);
-	uintptr_t offset = 256 - ((uintptr_t)full_data % 256);
-	memcpy((void*)(full_data + offset), door_texture_data, sizeof(door_texture_data));
-	uint8_t* data = (uint8_t*)(full_data+offset);
-
 	do {
 		key_update();
 		check_inputs(&x, &y);
@@ -75,7 +70,7 @@ int main(void) {
 		gfx_Wait();
 		for(uint8_t i = 0; i <= 159; i++) {
 			line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
-			gfx_TexturedVertLine(i, line_length, data + (i<<6) % 4096);
+			gfx_TexturedVertLine(i, line_length, texture_data + (i<<6) % 4096);
 		}
 
 		//dbg_printf("%lu\n", time_get_fps());
@@ -85,10 +80,8 @@ int main(void) {
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
 
-	//benchmark_disable();
 	time_disable();
-
-	free(data);
+	texture_disable();
 
 	// Reset the SPI to how it was before the program was run
 	asm("call $000384");
