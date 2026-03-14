@@ -53,3 +53,15 @@ with open("delta.txt", "a") as f:
         f.write(",\n")
 
     f.write("};\n")
+
+# ----------------------------------------
+    f.write("const uint24_t line_length_lut[")
+    f.write(str(180))
+    f.write("] = {\n")
+
+    for x in range(0, 180):
+        f.write("   ")
+        f.write(str(1260 - (7*x)))
+        f.write(",\n")
+
+    f.write("};\n")

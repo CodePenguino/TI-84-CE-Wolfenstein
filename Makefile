@@ -1,6 +1,6 @@
 NAME = WOLF3D
 ICON = icon.png
-DESCRIPTION = "Wolfenstein raycaster by Rodrigo Agras"
+DESCRIPTION = "Experimental wolfenstein raycaster"
 COMPRESSED = YES
 ARCHIVED = NO
 
