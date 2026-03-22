@@ -4,7 +4,7 @@
 	; Definitely not copy-pasted directly from the graphx source code ;)
 public __getSinCos
 __getSinCos:
-	; returns a = sin/cos(a) * 128
+	; returns sin(a) * 128
 	ld  c,a
 	bit 7,a
 	jr  z,$+4

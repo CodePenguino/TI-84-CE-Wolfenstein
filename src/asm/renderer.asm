@@ -93,7 +93,7 @@ drawFloor:
 	add iy,sp
 
 	ld  de,(iy+9)          ; de = other_length
-	ld  a,0xEF	; Set floor color
+	ld  a,0xEF             ; Set floor color
 
 	ld  iy,drawVertLine
 	add iy,de
