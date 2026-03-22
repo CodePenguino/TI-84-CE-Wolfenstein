@@ -127,8 +127,8 @@ __gfx_TexturedVertLine_Full:
 	exx
 
 	ld  de,ti.lcdWidth/2   ; de = screen width
-	ld  b,1				   ; Used to return from drawVertTex early only if
-						   ; we're jumping from this function
+	ld  b,1                ; Used to return from drawVertTex early only if
+                           ; we're jumping from this function
 	jp drawVertTex
 
 	; Draws a colored vertical line
