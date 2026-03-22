@@ -19,5 +19,5 @@ static inline void texture_init() {
 }
 
 static inline void texture_disable() {
-	free(texture_data);
+	free(texture_full_data);
 }
