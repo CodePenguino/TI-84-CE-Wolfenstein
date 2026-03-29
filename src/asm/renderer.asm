@@ -37,18 +37,11 @@ __gfx_TexturedVertLine_Partial:
 
 	ld  a,0xF1             ; Sets ceiling color
 
+	ld  de,(iy+6)          ; de (in stack) = length
+	push de
+
 	ld  de,(iy+9)          ; de = other_length
 	ld  c,e                ; c = other_length
-
-	ld  iy,drawVertLine
-	add iy,de
-	ld  de,ti.lcdWidth/2
-
-	call __gfx_VertLine_NoClip
-
-	; Reload variables
-	ld  iy,0
-	add iy,sp
 
 	exx
 	ld  de,(iy+12)         ; de' = texture pointer
@@ -57,7 +50,13 @@ __gfx_TexturedVertLine_Partial:
 	ld  bc,(iy+15)         ; bc' = delta (fixed point)
 	exx
 
-	ld  de,(iy+6)          ; de = length
+	ld  iy,drawVertLine
+	add iy,de
+	ld  de,ti.lcdWidth/2
+
+	call __gfx_VertLine_NoClip
+
+	pop de                 ; de = length
 
 	ld  iy,drawVertTex
 	add iy,de
