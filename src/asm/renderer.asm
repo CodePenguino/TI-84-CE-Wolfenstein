@@ -37,18 +37,14 @@ __gfx_TexturedVertLine_Partial:
 
 	ld  a,0xF1             ; Sets ceiling color
 
-	ld  de,(iy+9)          ; de = otherLength
+	ld  de,(iy+9)          ; de = other_length
+	ld  c,e                ; c = other_length
 
 	ld  iy,drawVertLine
 	add iy,de
 	ld  de,ti.lcdWidth/2
 
 	call __gfx_VertLine_NoClip
-	;; ld  c,(iy+6)           ; c = y
-	;; ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
-	;; mlt bc                 ; bc = b * c = y * 160
-	;; add hl,bc
-	;; add hl,bc
 
 	; Reload variables
 	ld  iy,0
@@ -89,10 +85,9 @@ end repeat
 	ret nz
 
 drawFloor:
-	ld  iy,0
-	add iy,sp
+	ld  d,a
+	ld  e,c                ; de = other_length
 
-	ld  de,(iy+9)          ; de = other_length
 	ld  a,0xEF             ; Set floor color
 
 	ld  iy,drawVertLine
@@ -100,8 +95,6 @@ drawFloor:
 	ld  de,ti.lcdWidth/2
 
 	jp (iy)
-
-	;; call __gfx_VertLine_NoClip
 
 	public __gfx_TexturedVertLine_Full
 __gfx_TexturedVertLine_Full:
