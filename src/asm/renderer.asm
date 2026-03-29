@@ -106,16 +106,16 @@ __gfx_TexturedVertLine_Full:
 	add hl,bc              ; hl += bc
 
 	exx
-	ld  de,(iy+9)          ; de' = texture offset (in fixed point)
-	ld  hl,(iy+6)          ; hl' = texture pointer
-	;; I wish you could do "add hl,d" but instead I need to do this
-	ld  a,l
-	add a,d
-	ld  l,a
+	ld  hl,(iy+9)          ; hl' = texture offset (in fixed point)
+	ld  de,(iy+6)          ; de' = texture pointer
+	ld  bc,(iy+12)         ; bc' = texture delta
 
-	ex de,hl               ; de' = texture pointer, hl' = texture offset
-	ld h,e
-	ld bc,(iy+12)
+	; I wish you could do "add de,h" but instead I need to do this
+	ld  a,e
+	add a,h
+	ld  e,a
+
+	ld  h,e
 	exx
 
 	ld  de,ti.lcdWidth/2   ; de = screen width
