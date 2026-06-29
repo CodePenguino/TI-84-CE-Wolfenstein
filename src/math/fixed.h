@@ -28,3 +28,5 @@ typedef int24_t fixed24;
 #define fxmul(a, b) (fixed24)((a * b) >> FIX_SHIFT)
 // Divide two fixed24 numbers
 #define fxdiv(a, b) (fixed24)(((a) * FIX_SCALE) / (b))
+
+#define FIX_PI          804

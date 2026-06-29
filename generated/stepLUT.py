@@ -61,7 +61,7 @@ with open("delta.txt", "a") as f:
 
     for x in range(0, 180):
         f.write("   ")
-        f.write(str(1260 - (7*x)))
+        f.write(str(1260 - (7*(x>>1 <<1))))
         f.write(",\n")
 
     f.write("};\n")

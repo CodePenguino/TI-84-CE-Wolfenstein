@@ -21,6 +21,8 @@
 	__typeof__ (mx) _mx = (mx); \
 	max(_mn, min(_mx, _x)); })
 
+#define abs(x) (x < 0) ? -x : x
+
 #ifdef __cplusplus
 extern "C" {
 #endif
