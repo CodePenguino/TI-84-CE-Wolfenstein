@@ -47,13 +47,6 @@ int worldMap[24][24]=
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1}
 	};
 
-/*static inline void check_inputs(float* x, float* y, float* dirX, float* dirY) {
-	if(key_pressed(kb_Up)) {
-		if(worldMap[(int)(x + dirX)][(int)(y)] == false) posX += dirX * moveSpeed;
-		if(worldMap[(int)(x)][int(posY + dirY * moveSpeed)] == false) posY += dirY * moveSpeed;
-	}
-}*/
-
 int main(void) {
 	// Calls _boot_InitializeHardware
 	asm("call $000384");
@@ -79,45 +72,55 @@ int main(void) {
 
 	uint24_t line_length = 0;
 
-	float posX = 22, posY = 12; // x and y start position
-	float dirX = -1, dirY = 0; // initial direction vector
-	float planeX = 0, planeY = 1; // the 2d raycaster version of camera plane
+	fixed24 posX = int2fx(22), posY = int2fx(12);
+	fixed24 dirX = -FIX_ONE, dirY = 0;
+	fixed24 planeX = 0, planeY = FIX_ONE;
 
-	const float moveSpeed = 0.5f;
+	uint8_t rotation = 0;
 
 	do {
 		key_update();
-		//check_inputs(&posX, &posY);
 
 		if(key_pressed(kb_Up)) {
-			if(worldMap[(int)(posX + dirX * moveSpeed)][(int)(posY)] == false)
-				posX += dirX * moveSpeed;
-			if(worldMap[(int)(posX)][(int)(posY + dirY * moveSpeed)] == false)
-				posY += dirY * moveSpeed;
+			posX += fxmul(dirX, 64);
+			posY += fxmul(dirY, 64);
 		}
 		if(key_pressed(kb_Down)) {
-			if(worldMap[(int)(posX + dirX * moveSpeed)][(int)(posY)] == false)
-				posX -= dirX * moveSpeed;
-			if(worldMap[(int)(posX)][(int)(posY + dirY * moveSpeed)] == false)
-				posY -= dirY * moveSpeed;
+			posX -= fxmul(dirX, 64);
+			posY -= fxmul(dirY, 64);
 		}
+		if(key_pressed(kb_Right)) {
+			rotation -= 4;
+		}
+		if(key_pressed(kb_Left)) {
+			rotation += 4;
+		}
+		dirX = -lu_cos(rotation)<<1;
+		dirY = -lu_sin(rotation)<<1;
 
+		planeX = -lu_sin(rotation)<<1;
+		planeY = lu_cos(rotation)<<1;
+
+		gfx_Wait();
 		for(int x = 0; x < 160; x++) {
 			//calculate ray position and direction
-			float cameraX = 2 * x / (float)160 - 1; //x-coordinate in camera space
-			float rayDirX = dirX + planeX * cameraX;
-			float rayDirY = dirY + planeY * cameraX;
+			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
+			fixed24 F_rayDirX = dirX + fxmul(planeX, cameraX);
+			fixed24 F_rayDirY = dirY + fxmul(planeY, cameraX);
+
 			//which box of the map we're in
-			int mapX = (int)(posX);
-			int mapY = (int)(posY);
+			uint8_t mapX = fx2int(posX);
+			uint8_t mapY = fx2int(posY);
 
-			float sideDistX;
-			float sideDistY;
+			fixed24 F_sideDistX;
+			fixed24 F_sideDistY;
 
-			float deltaDistX = (rayDirX == 0) ? 1e30 : abs(1 / rayDirX);
-			float deltaDistY = (rayDirY == 0) ? 1e30 : abs(1 / rayDirY);
+			fixed24 F_deltaDistX = (F_rayDirX == 0) ? INT24_MAX : abs(fxdiv(256, F_rayDirX));
+			fixed24 F_deltaDistY = (F_rayDirY == 0) ? INT24_MAX : abs(fxdiv(256, F_rayDirY));
 
-			float perpWallDist;
+			//dbg_printf("(%d, %d) - (%d, %d)\n", F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY);
+
+			fixed24 F_perpWallDist;
 
 			int8_t stepX;
 			int8_t stepY;
@@ -125,59 +128,56 @@ int main(void) {
 			bool hit = false; //was there a wall hit?
 			bool side; //was a NS or a EW wall hit?
 			//calculate step and initial sideDist
-			if(rayDirX < 0) {
+			if(F_rayDirX < 0) {
 				stepX = -1;
-				sideDistX = (posX - mapX) * deltaDistX;
+				F_sideDistX = fxmul((uint8_t)posX, F_deltaDistX);
 			}
 			else {
 				stepX = 1;
-				sideDistX = (mapX + 1.0 - posX) * deltaDistX;
+				F_sideDistX = fxmul((uint8_t)(-posX), F_deltaDistX);
 			}
-			if(rayDirY < 0) {
+			if(F_rayDirY < 0) {
 				stepY = -1;
-				sideDistY = (posY - mapY) * deltaDistY;
+				F_sideDistY = fxmul((uint8_t)posY, F_deltaDistY);
 			}
 			else {
 				stepY = 1;
-				sideDistY = (mapY + 1.0 - posY) * deltaDistY;
+				F_sideDistY = fxmul((uint8_t)(-posY), F_deltaDistY);
 			}
 			//perform DDA
 			while(hit == false) {
 				//jump to next map square, either in x-direction, or in y-direction
-				if(sideDistX < sideDistY) {
-					sideDistX += deltaDistX;
+				if(F_sideDistX < F_sideDistY) {
+					F_sideDistX += F_deltaDistX;
 					mapX += stepX;
 					side = false;
 				}
 				else {
-					sideDistY += deltaDistY;
+					F_sideDistY += F_deltaDistY;
 					mapY += stepY;
 					side = true;
 				}
 				//Check if ray has hit a wall
-				if(worldMap[mapX][mapY] > 0) {
+				if(worldMap[mapX][mapY] != 0) {
 					hit = true;
 				}
 			}
 
 			if(!side) {
-				perpWallDist = (sideDistX - deltaDistX);
+				F_perpWallDist = F_sideDistX - F_deltaDistX;
 			}
 			else {
-				perpWallDist = (sideDistY - deltaDistY);
+				F_perpWallDist = F_sideDistY - F_deltaDistY;
 			}
 
-			uint24_t lineHeight = (int)(180 / perpWallDist);
+			uint24_t line_height = int2fx(180) / F_perpWallDist;
 
 			//draw the pixels of the stripe as a vertical line
-			gfx_TexturedVertLine(x, lineHeight, texture_data);
+			if(side)
+				gfx_TexturedVertLine(x, line_height, texture_data);
+			else
+			 	gfx_TexturedVertLine(x, line_height, texture_data+64);
 		}
-
-		/*gfx_Wait();
-		for(uint8_t i = 0; i <= 159; i++) {
-			line_length = (240-((127+lu_sin(timer+(i*x)))>>3)-y)<<1;
-			gfx_TexturedVertLine(i, line_length, texture_data + (i<<6) % 4096);
-		}*/
 
 		//dbg_printf("%lu\n", time_get_fps());
 		timer_1_Counter = 0;
