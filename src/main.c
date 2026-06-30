@@ -115,8 +115,8 @@ int main(void) {
 			fixed24 F_sideDistX;
 			fixed24 F_sideDistY;
 
-			fixed24 F_deltaDistX = (F_rayDirX == 0) ? INT24_MAX : abs(fxdiv(256, F_rayDirX));
-			fixed24 F_deltaDistY = (F_rayDirY == 0) ? INT24_MAX : abs(fxdiv(256, F_rayDirY));
+			fixed24 F_deltaDistX = (F_rayDirX == 0) ? FIX_MAX : abs(fxdiv(256, F_rayDirX));
+			fixed24 F_deltaDistY = (F_rayDirY == 0) ? FIX_MAX : abs(fxdiv(256, F_rayDirY));
 
 			//dbg_printf("(%d, %d) - (%d, %d)\n", F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY);
 

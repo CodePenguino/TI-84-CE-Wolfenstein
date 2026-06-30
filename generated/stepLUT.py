@@ -65,3 +65,13 @@ with open("delta.txt", "a") as f:
         f.write(",\n")
 
     f.write("};\n")
+
+# ----------------------------------------
+    f.write("const int24_t camera_x_lut[160] = {\n")
+
+    for x in range(0, 160):
+        f.write("   ")
+        f.write(str(float2fx(((2*x)/160)-1)))
+        f.write(",\n")
+
+    f.write("};\n")

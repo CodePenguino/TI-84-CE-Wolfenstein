@@ -9,6 +9,7 @@ typedef int24_t fixed24;
 #define FIX_MASK        (FIX_SCALE-1)
 #define FIX_SCALEF      ((float)FIX_SCALE)
 #define FIX_SCALEF_INV  (1.0/FIX_SCALEF)
+#define FIX_MAX         (fixed24)8388607
 
 #define FIX_ONE         FIX_SCALE
 
