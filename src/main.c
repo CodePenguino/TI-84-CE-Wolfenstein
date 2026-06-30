@@ -109,8 +109,8 @@ int main(void) {
 			fixed24 F_rayDirY = dirY + fxmul(planeY, cameraX);
 
 			//which box of the map we're in
-			uint8_t mapX = fx2int(posX);
-			uint8_t mapY = fx2int(posY);
+			uint8_t mapX = posX >> 8;
+			uint8_t mapY = posY >> 8;
 
 			fixed24 F_sideDistX;
 			fixed24 F_sideDistY;
@@ -172,11 +172,23 @@ int main(void) {
 
 			uint24_t line_height = int2fx(180) / F_perpWallDist;
 
-			//draw the pixels of the stripe as a vertical line
-			if(side)
-				gfx_TexturedVertLine(x, line_height, texture_data);
-			else
-			 	gfx_TexturedVertLine(x, line_height, texture_data+64);
+			uint8_t wallX;
+			uint8_t texX;
+			if(!side) {
+				wallX = posY + fxmul(F_perpWallDist, F_rayDirY);
+				texX = fx2uint(wallX<<6);
+				if(F_rayDirX > 0) {
+					texX = 64 - texX - 1;
+				}
+			} else {
+				wallX = posX + fxmul(F_perpWallDist, F_rayDirX);
+				texX = fx2uint(wallX<<6);
+				if(F_rayDirY < 0) {
+					texX = 64 - texX - 1;
+				}
+			}
+
+			gfx_TexturedVertLine(x, line_height, texture_data + (texX<<6));
 		}
 
 		//dbg_printf("%lu\n", time_get_fps());
