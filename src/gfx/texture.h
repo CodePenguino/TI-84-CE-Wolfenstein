@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include "gfx.h"
+#include "texture/gfx.h"
 
 static uint8_t* texture_full_data;
 static uintptr_t texture_offset;
