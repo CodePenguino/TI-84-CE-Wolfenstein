@@ -3,7 +3,7 @@ This is a project made in an attempt to create a pseudo-3D raycaster for the TI-
 
 # How do I compile this?
 1. Install the TI-84 Plus CE Toolchain on your computer, following the instructions on its official website: https://ce-programming.github.io/toolchain/static/getting-started.html
-2. After cloning the repository, go to src/gfx and run the convimg yaml file. This should convert any images in the project to textures usable by the project.
+2. After cloning the repository, go to src/gfx/texture and run the convimg yaml file. This should convert any images in the project to usable textures.
 3. Go into the makefile and set the CEDEV variable to wherever you extracted the CEDev folder in step 1.
 4. Run the makefile
 
