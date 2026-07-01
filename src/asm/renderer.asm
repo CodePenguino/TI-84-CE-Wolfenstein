@@ -35,7 +35,7 @@ __gfx_TexturedVertLine_Partial:
 	ld  de,(iy+3)          ; de = x
 	add hl,de              ; hl += de
 
-	ld  a,0xF1             ; Sets ceiling color
+	ld  a,0xEC             ; Sets ceiling color
 
 	ld  de,(iy+6)          ; de (in stack) = length
 	push de
@@ -87,7 +87,7 @@ drawFloor:
 	ld  d,a
 	ld  e,c                ; de = other_length
 
-	ld  a,0xEF             ; Set floor color
+	ld  a,0x19             ; Set floor color
 
 	ld  iy,drawVertLine
 	add iy,de
