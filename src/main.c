@@ -64,7 +64,7 @@ int main(void) {
 		gfx_Wait();
 		for(uint8_t x = 0; x < 160; x++) {
 			//calculate ray position and direction
-			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
+			const fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
 			fixed24 F_rayDirX = dirX + fxmul(dirY, cameraX);
 			fixed24 F_rayDirY = dirY - fxmul(dirX, cameraX);
 
@@ -78,12 +78,9 @@ int main(void) {
 			uint24_t F_deltaDistX = div_lut[abs(F_rayDirX)];
 			uint24_t F_deltaDistY = div_lut[abs(F_rayDirY)];
 
-			uint24_t F_perpWallDist;
-
 			int8_t stepX;
 			int8_t stepY;
 
-			bool hit = false; //was there a wall hit?
 			bool side; //was a NS or a EW wall hit?
 			//calculate step and initial sideDist
 			if(F_rayDirX < 0) {
@@ -103,7 +100,8 @@ int main(void) {
 				F_sideDistY = fxmul((uint8_t)(-posY), F_deltaDistY);
 			}
 			//perform DDA
-			while(!hit) {
+			#pragma unroll(24)
+			for(int i = 0; i < 24; i++) {
 				//jump to next map square, either in x-direction, or in y-direction
 				if(F_sideDistX < F_sideDistY) {
 					F_sideDistX += F_deltaDistX;
@@ -117,9 +115,11 @@ int main(void) {
 				}
 				//Check if ray has hit a wall
 				if(worldMap[mapX][mapY] != 0) {
-					hit = true;
+					break;
 				}
 			}
+
+			uint24_t F_perpWallDist;
 
 			if(!side) {
 				F_perpWallDist = F_sideDistX - F_deltaDistX;
