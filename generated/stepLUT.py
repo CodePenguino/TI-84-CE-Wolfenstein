@@ -3,7 +3,7 @@ import math
 
 FIX_SHIFT      = 8
 FIX_SCALE      = (1<<FIX_SHIFT)
-NUM_ELEMENTS   = 384
+NUM_ELEMENTS   = 1024
 TEXTURE_HEIGHT = 64
 WINDOW_HEIGHT  = 180
 
@@ -21,8 +21,8 @@ with open("delta.txt", "a") as f:
     f.write(str(180))
     f.write("] = {\n")
 
-    for x in range(1, 180):
-        f.write("   ")
+    for x in range(1, 181):
+        f.write("    ")
         f.write(str(float2fx(TEXTURE_HEIGHT / x)))
         # f.write(str(fxdiv(TEXTURE_HEIGHT, x)))
         f.write(",\n")
@@ -35,7 +35,7 @@ with open("delta.txt", "a") as f:
     f.write("] = {\n")
 
     for x in range(181, NUM_ELEMENTS):
-        f.write("   ")
+        f.write("    ")
         f.write(str(float2fx(TEXTURE_HEIGHT / x)))
         f.write(",\n")
 
@@ -47,7 +47,7 @@ with open("delta.txt", "a") as f:
     f.write("] = {\n")
 
     for x in range(181, NUM_ELEMENTS):
-        f.write("   ")
+        f.write("    ")
         step_size = float(TEXTURE_HEIGHT / x)
         f.write(str(float2fx(((x-180)/2)*step_size)))
         f.write(",\n")
@@ -60,7 +60,7 @@ with open("delta.txt", "a") as f:
     f.write("] = {\n")
 
     for x in range(0, 180):
-        f.write("   ")
+        f.write("    ")
         f.write(str(1260 - (7*(x>>1 <<1))))
         f.write(",\n")
 
@@ -70,7 +70,7 @@ with open("delta.txt", "a") as f:
     f.write("const int24_t camera_x_lut[160] = {\n")
 
     for x in range(0, 160):
-        f.write("   ")
+        f.write("    ")
         f.write(str(float2fx(((2*x)/160)-1)))
         f.write(",\n")
 

@@ -12,14 +12,10 @@
 #include <debug.h>
 #include "gfx/spi.h"
 #include "gfx/texture.h"
-
-// Vars
-//#define mapX 8
-//#define mapY 8
-//#define mapS 64
+#include "math/lut.h"
 
 // TODO: Have this map do literally anything
-int worldMap[24][24]=
+const uint8_t worldMap[24][24]=
 	{
 		{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
 		{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
@@ -58,9 +54,6 @@ int main(void) {
 	// Set up wolfenstein color palette
 	gfx_SetPalette(global_palette, sizeof(global_palette), 0);
 
-	fixed24 x = 2, y = 170;
-	uint8_t timer = 0;
-
 	time_enable();
 	texture_init();
 	set_scaled_mode();
@@ -69,8 +62,6 @@ int main(void) {
 	gfx_FillScreen(6);
 	gfx_SwapDraw();
 	gfx_FillScreen(6);
-
-	uint24_t line_length = 0;
 
 	fixed24 posX = int2fx(22), posY = int2fx(12);
 	fixed24 dirX = -FIX_ONE, dirY = 0;
@@ -102,7 +93,7 @@ int main(void) {
 		planeY = lu_cos(rotation)<<1;
 
 		gfx_Wait();
-		for(int x = 0; x < 160; x++) {
+		for(uint8_t x = 0; x < 160; x++) {
 			//calculate ray position and direction
 			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
 			fixed24 F_rayDirX = dirX + fxmul(planeX, cameraX);
@@ -112,15 +103,13 @@ int main(void) {
 			uint8_t mapX = posX >> 8;
 			uint8_t mapY = posY >> 8;
 
-			fixed24 F_sideDistX;
-			fixed24 F_sideDistY;
+			uint24_t F_sideDistX;
+			uint24_t F_sideDistY;
 
-			fixed24 F_deltaDistX = (F_rayDirX == 0) ? FIX_MAX : abs(fxdiv(256, F_rayDirX));
-			fixed24 F_deltaDistY = (F_rayDirY == 0) ? FIX_MAX : abs(fxdiv(256, F_rayDirY));
+			uint24_t F_deltaDistX = div_lut[abs(F_rayDirX)];
+			uint24_t F_deltaDistY = div_lut[abs(F_rayDirY)];
 
-			//dbg_printf("(%d, %d) - (%d, %d)\n", F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY);
-
-			fixed24 F_perpWallDist;
+			uint24_t F_perpWallDist;
 
 			int8_t stepX;
 			int8_t stepY;
@@ -145,7 +134,7 @@ int main(void) {
 				F_sideDistY = fxmul((uint8_t)(-posY), F_deltaDistY);
 			}
 			//perform DDA
-			while(hit == false) {
+			while(!hit) {
 				//jump to next map square, either in x-direction, or in y-direction
 				if(F_sideDistX < F_sideDistY) {
 					F_sideDistX += F_deltaDistX;
@@ -176,13 +165,13 @@ int main(void) {
 			uint8_t texX;
 			if(!side) {
 				wallX = posY + fxmul(F_perpWallDist, F_rayDirY);
-				texX = fx2uint(wallX<<6);
+				texX = wallX>>2;
 				if(F_rayDirX > 0) {
 					texX = 64 - texX - 1;
 				}
 			} else {
 				wallX = posX + fxmul(F_perpWallDist, F_rayDirX);
-				texX = fx2uint(wallX<<6);
+				texX = wallX>>2;
 				if(F_rayDirY < 0) {
 					texX = 64 - texX - 1;
 				}
@@ -193,7 +182,6 @@ int main(void) {
 
 		//dbg_printf("%lu\n", time_get_fps());
 		timer_1_Counter = 0;
-		timer++;
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
