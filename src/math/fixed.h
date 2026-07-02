@@ -30,4 +30,7 @@ typedef int24_t fixed24;
 // Divide two fixed24 numbers
 #define fxdiv(a, b) (fixed24)(((a) * FIX_SCALE) / (b))
 
+// Multiply two fixed24 numbers (the first is stored as a uint8_t)
+extern fixed24 fxmul8(uint8_t a, fixed24 b);
+
 #define FIX_PI          804

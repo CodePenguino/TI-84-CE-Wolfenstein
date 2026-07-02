@@ -14,6 +14,7 @@
 #include "gfx/texture.h"
 #include "math/lut.h"
 #include "ray/map.h"
+#include "ray/ray.h"
 
 int main(void) {
 	// Calls _boot_InitializeHardware
@@ -64,7 +65,7 @@ int main(void) {
 		gfx_Wait();
 		for(uint8_t x = 0; x < 160; x++) {
 			//calculate ray position and direction
-			const fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
+			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
 			fixed24 F_rayDirX = dirX + fxmul(dirY, cameraX);
 			fixed24 F_rayDirY = dirY - fxmul(dirX, cameraX);
 
@@ -81,24 +82,25 @@ int main(void) {
 			int8_t stepX;
 			int8_t stepY;
 
-			bool side; //was a NS or a EW wall hit?
 			//calculate step and initial sideDist
 			if(F_rayDirX < 0) {
 				stepX = -1;
-				F_sideDistX = fxmul((uint8_t)posX, F_deltaDistX);
+				F_sideDistX = fxmul8(posX, F_deltaDistX);
 			}
 			else {
 				stepX = 1;
-				F_sideDistX = fxmul((uint8_t)(-posX), F_deltaDistX);
+				F_sideDistX = fxmul8((-posX), F_deltaDistX);
 			}
 			if(F_rayDirY < 0) {
 				stepY = -1;
-				F_sideDistY = fxmul((uint8_t)posY, F_deltaDistY);
+				F_sideDistY = fxmul8(posY, F_deltaDistY);
 			}
 			else {
 				stepY = 1;
-				F_sideDistY = fxmul((uint8_t)(-posY), F_deltaDistY);
+				F_sideDistY = fxmul8((-posY), F_deltaDistY);
 			}
+
+			bool side; //was a NS or a EW wall hit?
 			//perform DDA
 			#pragma unroll(24)
 			for(int i = 0; i < 24; i++) {
@@ -145,6 +147,17 @@ int main(void) {
 					texX = 64 - texX - 1;
 				}
 			}
+
+			//uint24_t line_height_dbg = raycast(x, F_rayDirX, F_rayDirY,
+			//	F_deltaDistX, F_deltaDistY, posX, posY);
+
+			//dbg_Debugger();
+			dbg_printf("%d - ", fxmul8(/*196,336*/(uint8_t)posX, F_deltaDistX));
+			dbg_printf("%d (", fxmul(/*196,336*/(uint8_t)posX, F_deltaDistX));
+			dbg_printf("%d, %d)\n", (uint8_t)posX, F_deltaDistX);
+
+			//uint24_t line_height = int2fx(180) / F_perpWallDist;
+
 
 			gfx_TexturedVertLine(x, line_height, texture_data + (texX<<6));
 		}
