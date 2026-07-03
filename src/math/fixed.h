@@ -34,6 +34,10 @@ typedef int24_t fixed24;
 // The fixed24 has to be within bounds of a signed 16-bit int
 extern fixed24 fxmul8abs(uint8_t a, fixed24 b);
 
+// Multiply two fixed 24 numbers (the first is stored as an int8_t)
+// The fixed24 has to be within bounds of a signed 16-bit int
+extern fixed24 fxmul8(int8_t a, fixed24 b);
+
 // Multiply two fixed24 numbers (both are positive)
 // Both fixed24s have to be within bounds of a signed 16-bit int
 extern fixed24 fxmul24abs(fixed24 a, fixed24 b);

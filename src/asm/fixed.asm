@@ -1,14 +1,7 @@
   assume adl=1
   section .text
 
-public _fxmul8abs
-_fxmul8abs:
-	ld iy,0
-	add iy,sp
-
-	ld a,(iy+3)
-	ld de,(iy+6)
-
+macro MUL8CODE
 	; hl = a*e (fractional)
 	ld h,a
 	ld l,e
@@ -24,6 +17,63 @@ _fxmul8abs:
 	mlt bc
 
 	add hl,bc
+end macro
+
+public _fxmul8abs
+_fxmul8abs:
+	ld iy,0
+	add iy,sp
+
+	ld a,(iy+3)
+	ld de,(iy+6)
+
+NORMALMUL8:
+	MUL8CODE
+
+	ret
+
+public _fxmul8
+_fxmul8:
+	ld iy,0
+	add iy,sp
+
+	ld a,(iy+3)
+	ld de,(iy+6)
+
+	ld c,0
+
+	; Check if int8 is positive
+CHECK1MUL8:
+	bit 7,a
+	jr z,CHECK2MUL8
+	neg
+	inc c
+
+CHECK2MUL8:
+	bit 7,d
+	jr z,AFTER_CHECK2MUL8
+
+	; invert de
+	scf
+	ccf
+	sbc hl,hl
+	sbc hl,de
+	ex de,hl
+
+	inc c
+
+AFTER_CHECK2MUL8:
+	; Don't invert result
+	bit 0,c
+	jr z,NORMALMUL8
+
+	MUL8CODE
+
+	scf ; reset carry flag
+	ccf
+	ex de,hl
+	sbc hl,hl
+	sbc hl,de ; hl is inverted
 
 	ret
 
@@ -71,51 +121,7 @@ _fxmul24abs:
 
 	ret
 
-public _fxmul24
-_fxmul24:
-	ld iy,0
-	add iy,sp
-
-	ld bc,(iy+3) ; bc = first
-	ld de,(iy+6) ; de = second
-
-	ld a,0
-
-CHECK1:
-	bit 7,b
-	jr z,CHECK2
-
-	; invert bc if it's negative
-	sbc hl,hl
-	sbc hl,bc
-
-	ld b,h
-	ld c,l
-	;scf
-	ccf ; ensure carry = 0
-
-	inc a
-
-CHECK2:
-
-	bit 7,d
-	jr z,AFTER_CHECK2
-
-	; invert de if it's negative
-	sbc hl,hl
-	sbc hl,de
-	ex de,hl
-	ld (iy+6),e ; 4 cycles
-
-	inc a
-
-AFTER_CHECK2:
-	; check if inversion at end is needed
-	bit 0,a
-	ld a,d
-	jr nz,INVMUL24
-
-NORMALMUL24:
+macro MUL24CODE
 	; ------ Whole bit of a ------
 	; hl = a*d
 	ld h,b
@@ -150,44 +156,56 @@ NORMALMUL24:
 	ld e,d
 	ld d,0
 	add hl,de ; add to result
+end macro
 
+public _fxmul24
+_fxmul24:
+	ld iy,0
+	add iy,sp
+
+	ld bc,(iy+3) ; bc = first
+	ld de,(iy+6) ; de = second
+
+	ld a,0
+
+CHECK1:
+	bit 7,b
+	jr z,CHECK2
+
+	; invert bc if it's negative
+	sbc hl,hl
+	sbc hl,bc
+
+	ld b,h
+	ld c,l
+	;scf
+	ccf ; ensure carry = 0
+
+	inc a
+
+CHECK2:
+	bit 7,d
+	jr z,AFTER_CHECK2
+
+	; invert de if it's negative
+	sbc hl,hl
+	sbc hl,de
+	ex de,hl
+	ld (iy+6),e ; 4 cycles
+
+	inc a
+
+AFTER_CHECK2:
+	; check if inversion at end is needed
+	bit 0,a
+	ld a,d
+	jr nz,INVMUL24
+
+	MUL24CODE
 	ret
 
 INVMUL24:
-	; ------ Whole bit of a ------
-	; hl = a*d
-	ld h,b
-	ld l,d
-	mlt hl
-	ld h,l
-	ld l,0
-
-	; de = a*e
-	ld d,b
-	mlt de
-
-	add hl,de ; add to result
-
-	; ------ Fractional bit of a ------
-	;ld de,(iy+6)
-	ld d,a
-
-	; de = d*c (whole)
-	ld e,c
-	mlt de
-
-	add hl,de ; add to result
-
-	; load e, negate it
-	ld e,(iy+6)
-
-	; de = c*e (fractional)
-	ld d,c
-	mlt de
-	; de /= 256
-	ld e,d
-	ld d,0
-	add hl,de ; add to result
+	MUL24CODE
 
 	; Negate the result
 	;ccf

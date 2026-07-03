@@ -45,12 +45,12 @@ int main(void) {
 		key_update();
 
 		if(key_pressed(kb_Up)) {
-			posX += fxmul24(dirX, 128);
-			posY += fxmul24(dirY, 128);
+			posX += fxmul8(dirX, 128);
+			posY += fxmul8(dirY, 128);
 		}
 		if(key_pressed(kb_Down)) {
-			posX -= fxmul24(dirX, 128);
-			posY -= fxmul24(dirY, 128);
+			posX -= fxmul8(dirX, 128);
+			posY -= fxmul8(dirY, 128);
 		}
 		if(key_pressed(kb_Right)) {
 			rotation -= 4;
@@ -66,8 +66,8 @@ int main(void) {
 		for(uint8_t x = 0; x < 160; x++) {
 			//calculate ray position and direction
 			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
-			fixed24 F_rayDirX = (dirX<<1) + fxmul24(dirY<<1, cameraX);
-			fixed24 F_rayDirY = (dirY<<1) - fxmul24(dirX<<1, cameraX);
+			fixed24 F_rayDirX = ((dirX<<1) + fxmul24(dirY<<1, cameraX));
+			fixed24 F_rayDirY = ((dirY<<1) - fxmul24(dirX<<1, cameraX));
 
 			//which box of the map we're in
 			uint8_t mapX = posX >> 8;
@@ -105,7 +105,6 @@ int main(void) {
 			#pragma unroll(24)
 			for(int i = 0; i < 24; i++) {
 				//jump to next map square, either in x-direction, or in y-direction
-				//dbg_printf("%d, %d\n", (uint8_t)(F_sideDistX), (uint8_t)(F_sideDistY));
 				if(F_sideDistX < F_sideDistY) {
 					F_sideDistX += F_deltaDistX;
 					mapX += stepX;
@@ -148,16 +147,6 @@ int main(void) {
 					texX = 64 - texX - 1;
 				}
 			}
-
-			//dbg_Debugger();
-			//volatile int24_t res = -3;
-			//res = abs24(res);
-
-			//dbg_printf("%d\n", res);
-			//dbg_Debugger();
-			//dbg_printf("%d, ", fxmul8(-posX, F_deltaDistX));
-			//dbg_printf("%d\n", raycast(x, F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY));
-			//dbg_Debugger();
 
 			gfx_TexturedVertLine(x, line_height, texture_data + (texX<<6));
 		}
