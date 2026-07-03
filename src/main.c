@@ -62,12 +62,12 @@ int main(void) {
 		dirX = -lu_cos(rotation)<<1;
 		dirY = -lu_sin(rotation)<<1;
 
-		gfx_Wait();
+		//gfx_Wait();
 		for(uint8_t x = 0; x < 160; x++) {
 			//calculate ray position and direction
 			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
-			fixed24 F_rayDirX = dirX + fxmul(dirY, cameraX);
-			fixed24 F_rayDirY = dirY - fxmul(dirX, cameraX);
+			fixed24 F_rayDirX = dirX + fxmul24(dirY, cameraX);
+			fixed24 F_rayDirY = dirY - fxmul24(dirX, cameraX);
 
 			//which box of the map we're in
 			uint8_t mapX = posX >> 8;
@@ -84,20 +84,20 @@ int main(void) {
 
 			//calculate step and initial sideDist
 			if(F_rayDirX < 0) {
-				stepX = -1;
 				F_sideDistX = fxmul8(posX, F_deltaDistX);
+				stepX = -1;
 			}
 			else {
-				stepX = 1;
 				F_sideDistX = fxmul8((-posX), F_deltaDistX);
+				stepX = 1;
 			}
 			if(F_rayDirY < 0) {
-				stepY = -1;
 				F_sideDistY = fxmul8(posY, F_deltaDistY);
+				stepY = -1;
 			}
 			else {
-				stepY = 1;
 				F_sideDistY = fxmul8((-posY), F_deltaDistY);
+				stepY = 1;
 			}
 
 			bool side; //was a NS or a EW wall hit?
@@ -135,34 +135,28 @@ int main(void) {
 			uint8_t wallX;
 			uint8_t texX;
 			if(!side) {
-				wallX = posY + fxmul(F_perpWallDist, F_rayDirY);
+				wallX = posY + fxmul24(F_perpWallDist, F_rayDirY);
 				texX = wallX>>2;
 				if(F_rayDirX > 0) {
 					texX = 64 - texX - 1;
 				}
 			} else {
-				wallX = posX + fxmul(F_perpWallDist, F_rayDirX);
+				wallX = posX + fxmul24(F_perpWallDist, F_rayDirX);
 				texX = wallX>>2;
 				if(F_rayDirY < 0) {
 					texX = 64 - texX - 1;
 				}
 			}
 
-			//uint24_t line_height_dbg = raycast(x, F_rayDirX, F_rayDirY,
-			//	F_deltaDistX, F_deltaDistY, posX, posY);
-
 			//dbg_Debugger();
-			dbg_printf("%d - ", fxmul8(/*196,336*/(uint8_t)posX, F_deltaDistX));
-			dbg_printf("%d (", fxmul(/*196,336*/(uint8_t)posX, F_deltaDistX));
-			dbg_printf("%d, %d)\n", (uint8_t)posX, F_deltaDistX);
+			//dbg_printf("%d, ", fxmul8(-posX, F_deltaDistX));
+			//dbg_printf("%d\n", raycast(x, F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY));
+			//dbg_Debugger();
 
-			//uint24_t line_height = int2fx(180) / F_perpWallDist;
-
-
-			gfx_TexturedVertLine(x, line_height, texture_data + (texX<<6));
+			gfx_TexturedVertLine(x, line_height, texture_data + (texX*64));
 		}
 
-		//dbg_printf("%lu\n", time_get_fps());
+		dbg_printf("%lu\n", time_get_fps());
 		timer_1_Counter = 0;
 
 		gfx_SwapDraw();
