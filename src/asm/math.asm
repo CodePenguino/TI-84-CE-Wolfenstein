@@ -24,6 +24,45 @@ __getSinCos:
 	neg        ; negate if greater
 	ret
 
+public __getSinCosNeg
+__getSinCosNeg:
+	; returns sin(a) * 128
+	ld  c,a    ; c = a (original angle)
+	bit 7,a
+	jr  z,$+4  ; jump if a is 0-127
+	sub a,128  ; a -= 128
+	bit 6,a
+	jr  z,$+6  ; jump if a is 128-191
+	ld  e,a    ; e = angle
+	ld  a,128  ; a = 128
+	sub a,e    ; a -= angle (a = 128 - angle)
+	ld  de,0
+	ld  e,a    ; e = a
+	ld  hl,_SineTable
+	add hl,de
+	ld  a,(hl)
+	bit 7,c    ; return if input is 0-127
+	ret nz
+	neg        ; negate if greater
+	ret
+
+public __abs24
+__abs24:
+	; return absolute value of an int24
+	ld iy,0
+	add iy,sp
+
+	bit 7,h ; positive? return
+	ret z
+
+	scf
+	ccf
+	ex de,hl
+	sbc hl,hl
+	sbc hl,de
+
+	ret
+
   section .rodata
 	public _SineTable
 _SineTable:

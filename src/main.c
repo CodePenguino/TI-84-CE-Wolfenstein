@@ -37,7 +37,7 @@ int main(void) {
 	gfx_FillScreen(6);
 
 	fixed24 posX = int2fx(22), posY = int2fx(12);
-	fixed24 dirX = -FIX_ONE, dirY = 0;
+	int8_t dirX = -127, dirY = 0;
 
 	uint8_t rotation = 0;
 
@@ -45,12 +45,12 @@ int main(void) {
 		key_update();
 
 		if(key_pressed(kb_Up)) {
-			posX += fxmul(dirX, 64);
-			posY += fxmul(dirY, 64);
+			posX += fxmul24(dirX, 128);
+			posY += fxmul24(dirY, 128);
 		}
 		if(key_pressed(kb_Down)) {
-			posX -= fxmul(dirX, 64);
-			posY -= fxmul(dirY, 64);
+			posX -= fxmul24(dirX, 128);
+			posY -= fxmul24(dirY, 128);
 		}
 		if(key_pressed(kb_Right)) {
 			rotation -= 4;
@@ -59,15 +59,15 @@ int main(void) {
 			rotation += 4;
 		}
 
-		dirX = -lu_cos(rotation)<<1;
-		dirY = -lu_sin(rotation)<<1;
+		dirX = lu_cosneg(rotation);
+		dirY = lu_sinneg(rotation);
 
 		//gfx_Wait();
 		for(uint8_t x = 0; x < 160; x++) {
 			//calculate ray position and direction
 			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
-			fixed24 F_rayDirX = dirX + fxmul24(dirY, cameraX);
-			fixed24 F_rayDirY = dirY - fxmul24(dirX, cameraX);
+			fixed24 F_rayDirX = (dirX<<1) + fxmul24(dirY<<1, cameraX);
+			fixed24 F_rayDirY = (dirY<<1) - fxmul24(dirX<<1, cameraX);
 
 			//which box of the map we're in
 			uint8_t mapX = posX >> 8;
@@ -76,27 +76,27 @@ int main(void) {
 			uint24_t F_sideDistX;
 			uint24_t F_sideDistY;
 
-			uint24_t F_deltaDistX = div_lut[abs(F_rayDirX)];
-			uint24_t F_deltaDistY = div_lut[abs(F_rayDirY)];
+			uint24_t F_deltaDistX = div_lut[abs24(F_rayDirX)];
+			uint24_t F_deltaDistY = div_lut[abs24(F_rayDirY)];
 
 			int8_t stepX;
 			int8_t stepY;
 
 			//calculate step and initial sideDist
 			if(F_rayDirX < 0) {
-				F_sideDistX = fxmul8(posX, F_deltaDistX);
+				F_sideDistX = fxmul8abs(posX, F_deltaDistX);
 				stepX = -1;
 			}
 			else {
-				F_sideDistX = fxmul8((-(posX+1)), F_deltaDistX);
+				F_sideDistX = fxmul8abs((-(posX+1)), F_deltaDistX);
 				stepX = 1;
 			}
 			if(F_rayDirY < 0) {
-				F_sideDistY = fxmul8(posY, F_deltaDistY);
+				F_sideDistY = fxmul8abs(posY, F_deltaDistY);
 				stepY = -1;
 			}
 			else {
-				F_sideDistY = fxmul8((-(posY+1)), F_deltaDistY);
+				F_sideDistY = fxmul8abs((-(posY+1)), F_deltaDistY);
 				stepY = 1;
 			}
 
@@ -105,6 +105,7 @@ int main(void) {
 			#pragma unroll(24)
 			for(int i = 0; i < 24; i++) {
 				//jump to next map square, either in x-direction, or in y-direction
+				//dbg_printf("%d, %d\n", (uint8_t)(F_sideDistX), (uint8_t)(F_sideDistY));
 				if(F_sideDistX < F_sideDistY) {
 					F_sideDistX += F_deltaDistX;
 					mapX += stepX;
@@ -149,11 +150,16 @@ int main(void) {
 			}
 
 			//dbg_Debugger();
+			//volatile int24_t res = -3;
+			//res = abs24(res);
+
+			//dbg_printf("%d\n", res);
+			//dbg_Debugger();
 			//dbg_printf("%d, ", fxmul8(-posX, F_deltaDistX));
 			//dbg_printf("%d\n", raycast(x, F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY));
 			//dbg_Debugger();
 
-			gfx_TexturedVertLine(x, line_height, texture_data + (texX*64));
+			gfx_TexturedVertLine(x, line_height, texture_data + (texX<<6));
 		}
 
 		dbg_printf("%lu\n", time_get_fps());

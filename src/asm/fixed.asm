@@ -1,8 +1,8 @@
   assume adl=1
   section .text
 
-public _fxmul8
-_fxmul8:
+public _fxmul8abs
+_fxmul8abs:
 	ld iy,0
 	add iy,sp
 
