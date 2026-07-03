@@ -88,7 +88,7 @@ int main(void) {
 				stepX = -1;
 			}
 			else {
-				F_sideDistX = fxmul8((-posX), F_deltaDistX);
+				F_sideDistX = fxmul8((-(posX+1)), F_deltaDistX);
 				stepX = 1;
 			}
 			if(F_rayDirY < 0) {
@@ -96,7 +96,7 @@ int main(void) {
 				stepY = -1;
 			}
 			else {
-				F_sideDistY = fxmul8((-posY), F_deltaDistY);
+				F_sideDistY = fxmul8((-(posY+1)), F_deltaDistY);
 				stepY = 1;
 			}
 
