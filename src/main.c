@@ -103,7 +103,7 @@ int main(void) {
 			bool side = false; //was a NS or a EW wall hit?
 			//perform DDA
 			#pragma unroll(24)
-			for(int i = 0; i < 24; i++) {
+			for(uint8_t i = 24; i >= 0; i--) {
 				//jump to next map square, either in x-direction, or in y-direction
 				if(F_sideDistX < F_sideDistY) {
 					F_sideDistX += F_deltaDistX;
@@ -112,23 +112,15 @@ int main(void) {
 						side = false;
 						break;
 					}
-
-					//side = false;
 				}
 				else {
 					F_sideDistY += F_deltaDistY;
 					mapY += stepY;
 					if(Map[mapY+(mapX<<5)] != 0) {
-						side = false;
 						side = true;
 						break;
 					}
-					//side = true;
 				}
-				//Check if ray has hit a wall
-				//if(worldMap[mapX][mapY] != 0) {
-				//	break;
-				//}
 			}
 
 			uint24_t F_perpWallDist;
