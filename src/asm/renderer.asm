@@ -41,6 +41,7 @@ __gfx_TexturedVertLine_Partial:
 	push de
 
 	ld  de,(iy+9)          ; de = other_length
+	res 0,e                ; make sure other_length is even
 	ld  c,e                ; c = other_length
 
 	exx

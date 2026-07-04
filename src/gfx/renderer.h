@@ -61,7 +61,7 @@ static inline void gfx_TexturedVertLine(uint8_t x, uint24_t length,
 		const uint8_t* texture) {
 	if(length < 180) {
 		// other_length = 180 - (2*((180-length)/2))
-		_gfx_TexturedVertLine_Partial(x, line_length_lut[length], (length>>1)<<1,
+		_gfx_TexturedVertLine_Partial(x, line_length_lut[length], length,
 			texture, texture_lut_u24[length]);
 	}
 	else {
