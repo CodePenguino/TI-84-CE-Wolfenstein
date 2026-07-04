@@ -63,6 +63,17 @@ __abs24:
 
 	ret
 
+public __texOffCalc
+__texOffCalc:
+	; a = texX
+	; 252 = 1111 1100 (in binary)
+	and a,252
+	ld h,a
+	ld l,16
+	mlt hl
+
+	ret
+
   section .rodata
 	public _SineTable
 _SineTable:

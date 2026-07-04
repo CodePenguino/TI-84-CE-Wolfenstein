@@ -132,32 +132,36 @@ int main(void) {
 				F_perpWallDist = F_sideDistY - F_deltaDistY;
 			}
 
+			dbg_Debugger();
 			uint24_t line_height = int2fx(180) / F_perpWallDist;
 			//dbg_Debugger();
 			//dbg_printf("%d, %d\n", raycast(x, F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY),
 			//	fxmul8abs(posX, F_deltaDistX));
 
-			uint8_t wallX;
 			uint8_t texX;
 			if(!side) {
-				wallX = posY + fxmul24(F_perpWallDist, F_rayDirY);
-				texX = wallX>>2;
-				if(F_rayDirX > 0) {
-					texX = 64 - texX - 1;
+				texX = posY + fxmul24(F_perpWallDist, F_rayDirY);
+				//if(F_rayDirX > 0) {
+				if(stepX != -1) {
+					texX = (-texX)-1;
 				}
 			} else {
-				wallX = posX + fxmul24(F_perpWallDist, F_rayDirX);
-				texX = wallX>>2;
-				if(F_rayDirY < 0) {
-					texX = 64 - texX - 1;
+				texX = posX + fxmul24(F_perpWallDist, F_rayDirX);
+				//if(F_rayDirY < 0) {
+				if(stepY != 1) {
+					texX = (-texX)-1;
 				}
 			}
 
-			gfx_TexturedVertLine(x, line_height, texture_data + (texX<<6));
+			uint24_t texOff = tex_OffCalc(texX);
+
+			gfx_TexturedVertLine(x, line_height, texture_data + texOff);
 		}
 
+		#ifdef DEBUG
 		dbg_printf("%lu\n", time_get_fps());
 		timer_1_Counter = 0;
+		#endif
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
