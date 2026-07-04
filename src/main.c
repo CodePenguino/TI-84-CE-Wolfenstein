@@ -88,7 +88,7 @@ int main(void) {
 				stepX = -1;
 			}
 			else {
-				F_sideDistX = fxmul8abs((-(posX+1)), F_deltaDistX);
+				F_sideDistX = fxmul8abs((-posX)-1, F_deltaDistX);
 				stepX = 1;
 			}
 			if(F_rayDirY < 0) {
@@ -96,11 +96,11 @@ int main(void) {
 				stepY = -1;
 			}
 			else {
-				F_sideDistY = fxmul8abs((-(posY+1)), F_deltaDistY);
+				F_sideDistY = fxmul8abs((-posY)-1, F_deltaDistY);
 				stepY = 1;
 			}
 
-			bool side; //was a NS or a EW wall hit?
+			bool side = false; //was a NS or a EW wall hit?
 			//perform DDA
 			#pragma unroll(24)
 			for(int i = 0; i < 24; i++) {
@@ -108,17 +108,27 @@ int main(void) {
 				if(F_sideDistX < F_sideDistY) {
 					F_sideDistX += F_deltaDistX;
 					mapX += stepX;
-					side = false;
+					if(Map[mapY+(mapX<<5)] != 0) {
+						side = false;
+						break;
+					}
+
+					//side = false;
 				}
 				else {
 					F_sideDistY += F_deltaDistY;
 					mapY += stepY;
-					side = true;
+					if(Map[mapY+(mapX<<5)] != 0) {
+						side = false;
+						side = true;
+						break;
+					}
+					//side = true;
 				}
 				//Check if ray has hit a wall
-				if(worldMap[mapX][mapY] != 0) {
-					break;
-				}
+				//if(worldMap[mapX][mapY] != 0) {
+				//	break;
+				//}
 			}
 
 			uint24_t F_perpWallDist;
@@ -131,6 +141,9 @@ int main(void) {
 			}
 
 			uint24_t line_height = int2fx(180) / F_perpWallDist;
+			//dbg_Debugger();
+			//dbg_printf("%d, %d\n", raycast(x, F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY),
+			//	fxmul8abs(posX, F_deltaDistX));
 
 			uint8_t wallX;
 			uint8_t texX;
