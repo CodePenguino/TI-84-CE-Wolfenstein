@@ -49,8 +49,8 @@ __getSinCosNeg:
 public __abs24
 __abs24:
 	; return absolute value of an int24
-	ld iy,0
-	add iy,sp
+	;ld iy,0
+	;add iy,sp
 
 	bit 7,h ; positive? return
 	ret z
