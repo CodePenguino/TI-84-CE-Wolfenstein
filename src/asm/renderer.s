@@ -1,12 +1,46 @@
-assume adl=1
-include 'ti84pceg.inc'
+	.assume adl=1
+;	.include "ti84pceg.inc"
 
-LcdSize            := ti.lcdWidth*ti.lcdHeight
-CurrentBuffer      := ti.mpLcdLpbase
+CurrentBuffer      := 0E30014h
 
-	section .text
+; The assembler couldn't handle a 180-repeat loop
+; so the code had to be duplicated...
+.macro texmac from=1, to=90
+	exx
+	add hl,bc
+	ld  e,h
+	ld  a,(de)
+	exx
 
-	public _gfx_SetPixel2_NoClip
+	ld (hl),a
+	add hl,de
+
+	exx
+	add hl,bc
+	ld  e,h
+	ld  a,(de)
+	exx
+
+	ld (hl),a
+	add hl,de
+
+	.if \to-\from
+	texmac "(\from+1)",\to
+	.endif
+.endm
+
+.macro colmac from=1, to=90
+	ld (hl),a
+	add hl,de
+
+	.if \to-\from
+	colmac "(\from+1)",\to
+	.endif
+.endm
+
+	.section .text._gfx_SetPixel2_NoClip
+	.global _gfx_SetPixel2_NoClip
+	.type _gfx_SetPixel2_NoClip, @function
 _gfx_SetPixel2_NoClip:
 	; Set up iy register
 	ld  iy, 0
@@ -16,7 +50,7 @@ _gfx_SetPixel2_NoClip:
 	ld  bc,(iy+3)          ; bc = x
 	add hl,bc              ; hl += bc
 	ld  c,(iy+6)           ; c = y
-	ld  b,ti.lcdWidth / 2  ; b = lcdWidth / 2 = 160
+	ld  b,160              ; b = lcdWidth / 2 = 160
 	mlt bc                 ; bc = b * c (y * 160)
 	add hl,bc
 	ld  a,(iy+9)           ; a = c
@@ -24,8 +58,10 @@ _gfx_SetPixel2_NoClip:
 	ret
 
 
+	.section .text.__gfx_TexturedVertLine_Partial
+	.global __gfx_TexturedVertLine_Partial
+	.type __gfx_TexturedVertLine_Partial, @function
 
-	public __gfx_TexturedVertLine_Partial
 __gfx_TexturedVertLine_Partial:
 	; Set up iy register
 	ld  iy,0
@@ -53,7 +89,7 @@ __gfx_TexturedVertLine_Partial:
 
 	ld  iy,drawVertLine
 	add iy,de
-	ld  de,ti.lcdWidth/2
+	ld  de,160             ; de = lcdWidth / 2 = 160
 
 	call __gfx_VertLine_NoClip
 
@@ -62,22 +98,13 @@ __gfx_TexturedVertLine_Partial:
 	ld  iy,drawVertTex
 	add iy,de
 
-	ld  de,ti.lcdWidth/2   ; de = screen width
+	ld  de,160             ; de = screen width = 160
 	ld  b,0
 
 	jp (iy)
 
 drawVertTex:
-repeat 180                 ; Kids, SERIOUSLY don't try this at home...
-	exx
-	add hl,bc
-	ld  e,h
-	ld  a,(de)
-	exx
-
-	ld (hl),a
-	add hl,de
-end repeat
+	texmac
 
 	;; Used to check if we should return early or not...
 	ld a,0
@@ -92,11 +119,14 @@ drawFloor:
 
 	ld  iy,drawVertLine
 	add iy,de
-	ld  de,ti.lcdWidth/2
+	ld  de,160;ti.lcdWidth/2
 
 	jp (iy)
 
-	public __gfx_TexturedVertLine_Full
+	.section .text.__gfx_TexturedVertLine_Full
+	.global __gfx_TexturedVertLine_Full
+	.type __gfx_TexturedVertLine_Full, @function
+
 __gfx_TexturedVertLine_Full:
 	; Set up iy register
 	ld  iy,0
@@ -119,25 +149,20 @@ __gfx_TexturedVertLine_Full:
 	ld  h,e
 	exx
 
-	ld  de,ti.lcdWidth/2   ; de = screen width
+	ld  de,160;ti.lcdWidth/2   ; de = screen width
 	ld  b,1                ; Used to return from drawVertTex early only if
                            ; we're jumping from this function
 	jp drawVertTex
 
 	; Draws a colored vertical line
-	public __gfx_VertLine_NoClip
 __gfx_VertLine_NoClip:
 	jp (iy)
 
 	; Same unrolled loop trick as used for the textured line
 drawVertLine:
-repeat 90
-	ld (hl),a
-	add hl,de
-end repeat
+	colmac
 	ret
 
-	public __gfx_VertLine_Scuffed
 __gfx_VertLine_Scuffed:
 	ld  iy,0
 	add iy,sp
@@ -151,7 +176,7 @@ __gfx_VertLine_Scuffed:
 
 	ld  iy,drawVertLine
 	add iy,de
-	ld  de,ti.lcdWidth/2
+	ld  de,160;ti.lcdWidth/2
 
 	jp (iy)
 	ret

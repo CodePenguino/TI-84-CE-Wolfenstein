@@ -1,8 +1,6 @@
-    assume adl=1
+    .assume adl=1
 
-    section .text
-
-macro MUL8CODE
+.macro MUL8CODE
 	; hl = a*c (fractional)
 	ld h,a
 	ld l,c
@@ -18,8 +16,7 @@ macro MUL8CODE
 	mlt de
 
 	add hl,de
-end macro
-
+.endm
 
     ; F_rayDirX is negative
 SIDEDISTMUL_NEG:
@@ -41,7 +38,9 @@ SIDEDISTMUL_POS:
     ret
 
 
-public _raycast
+	.section .text._raycast
+	.global _raycast
+	.type _raycast, @function
 _raycast:
     ld iy,0
     add iy,sp
@@ -134,9 +133,8 @@ SIDEDISTXBIGGER:
 
     ret
 
-
-    section .rodata
-public _Map
+	.section .rodata._Map
+	.global _Map
 _Map:
 	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1

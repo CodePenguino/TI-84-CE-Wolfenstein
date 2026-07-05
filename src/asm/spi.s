@@ -1,17 +1,15 @@
-	assume adl=1
-section .text
+	.assume adl=1
 
-include 'ti84pceg.inc'
-
-macro SPI_CMD cmd
-	ld a,cmd
+.macro SPI_CMD cmd
+	ld a,\cmd
 	call spiCmd
-end macro
+.endm
 
-macro SPI_PARAM param
-	ld a,param
+.macro SPI_PARAM param
+	ld a,\param
 	call spiParam
-end macro
+.endm
+;end macro
 
 ;macro SPI_PARAM16 param
 	;ld a, param >> 8
@@ -21,7 +19,11 @@ end macro
 	;call spiParam
 ;end macro
 
-	public _set_scaled_mode
+	.section .text._set_scaled_mode
+	.global _set_scaled_mode
+	.type _set_scaled_mode, @function
+
+;	public _set_scaled_mode
 _set_scaled_mode:
 	SPI_CMD $2A      ; X left/right bounds
 	SPI_PARAM 0

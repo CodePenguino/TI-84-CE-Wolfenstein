@@ -1,7 +1,6 @@
-  assume adl=1
-  section .text
+	.assume adl=1
 
-macro MUL8CODE
+.macro MUL8CODE
 	; hl = a*e (fractional)
 	ld h,a
 	ld l,e
@@ -17,9 +16,11 @@ macro MUL8CODE
 	mlt bc
 
 	add hl,bc
-end macro
+.endm
 
-public _fxmul8abs
+	.section .text._fxmul8abs
+	.global _fxmul8abs
+	.type _fxmul8abs, @function
 _fxmul8abs:
 	ld iy,0
 	add iy,sp
@@ -32,7 +33,9 @@ NORMALMUL8:
 
 	ret
 
-public _fxmul8
+	.section .text._fxmul8
+	.global _fxmul8
+	.type _fxmul8, @function
 _fxmul8:
 	ld iy,0
 	add iy,sp
@@ -77,7 +80,9 @@ AFTER_CHECK2MUL8:
 
 	ret
 
-public _fxmul24abs
+	.section .text._fxmul24abs
+	.global _fxmul24abs
+	.type _fxmul24abs, @function
 _fxmul24abs:
 	ld iy,0
 	add iy,sp
@@ -121,7 +126,7 @@ _fxmul24abs:
 
 	ret
 
-macro MUL24CODE
+.macro MUL24CODE
 	; ------ Whole bit of a ------
 	; hl = a*d
 	ld h,b
@@ -156,9 +161,11 @@ macro MUL24CODE
 	ld e,d
 	ld d,0
 	add hl,de ; add to result
-end macro
+.endm
 
-public _fxmul24
+	.section .text._fxmul24
+	.global _fxmul24
+	.type _fxmul24, @function
 _fxmul24:
 	ld iy,0
 	add iy,sp
@@ -209,13 +216,15 @@ INVMUL24:
 
 	; Negate the result
 	;ccf
-	ex hl,de
+	ex de,hl
 	sbc hl,hl
 	sbc hl,de
 
 	ret
 
-public __fx2uint
+	.section .text.__fx2uint
+	.global __fx2uint
+	.type __fx2uint, @function
 __fx2uint:
 	ld  iy,0
 	add iy,sp

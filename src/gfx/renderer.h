@@ -43,18 +43,18 @@ extern void _gfx_TexturedVertLine_Partial(uint24_t x, uint24_t length,
 extern void _gfx_TexturedVertLine_Full(uint24_t x, const uint8_t* texture,
 	uint24_t texture_offset, uint24_t delta);
 
-extern void _gfx_VertLine_NoClip();
+//extern void _gfx_VertLine_NoClip();
 
-extern void _gfx_VertLine_Scuffed(uint24_t x, uint24_t length, uint8_t color);
+//extern void _gfx_VertLine_Scuffed(uint24_t x, uint24_t length, uint8_t color);
 
 #ifdef __cplusplus
 }
 #endif
 
-static inline void gfx_VertLine_Scuffed(uint24_t x, uint24_t length,
+/*static inline void gfx_VertLine_Scuffed(uint24_t x, uint24_t length,
 		uint8_t color) {
 	_gfx_VertLine_Scuffed(x, 180-(length<<1), color);
-}
+}*/
 
 // Draw a vertical line on the screen
 static inline void gfx_TexturedVertLine(uint8_t x, uint24_t length,

@@ -1,8 +1,9 @@
-  assume adl=1
+	.assume adl=1
 
-  section .text
+	.section .text.__getSinCos
 	; Definitely not copy-pasted directly from the graphx source code ;)
-public __getSinCos
+	.global __getSinCos
+	.type __getSinCos, @function
 __getSinCos:
 	; returns sin(a) * 128
 	ld  c,a    ; c = a (original angle)
@@ -24,7 +25,9 @@ __getSinCos:
 	neg        ; negate if greater
 	ret
 
-public __getSinCosNeg
+	.section .text.__getSinCosNeg
+	.global __getSinCosNeg
+	.type __getSinCosNeg, @function
 __getSinCosNeg:
 	; returns sin(a) * 128
 	ld  c,a    ; c = a (original angle)
@@ -46,7 +49,9 @@ __getSinCosNeg:
 	neg        ; negate if greater
 	ret
 
-public __abs24
+	.section .text.__abs24
+	.global __abs24
+	.type __abs24, @function
 __abs24:
 	; return absolute value of an int24
 	;ld iy,0
@@ -63,7 +68,9 @@ __abs24:
 
 	ret
 
-public __texOffCalc
+	.section .text.__texOffCalc
+	.global __texOffCalc
+	.type __texOffCalc, @function
 __texOffCalc:
 	; a = texX
 	; 252 = 1111 1100 (in binary)
@@ -74,8 +81,9 @@ __texOffCalc:
 
 	ret
 
-  section .rodata
-	public _SineTable
+	.section .rodata._SineTable
+	.global _SineTable
+
 _SineTable:
 	; sin(x) * 128
 	db 0,3,6,9,13,16,19,22,25,28,31,34,37,40,43,46

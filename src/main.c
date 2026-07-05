@@ -32,9 +32,12 @@ int main(void) {
 	set_scaled_mode();
 
 	// Draw blue border
-	gfx_FillScreen(6);
+	memset(gfx_vbuffer, 6, 160*240);
+	//gfx_FillScreen(6);
 	gfx_SwapDraw();
-	gfx_FillScreen(6);
+	memset(gfx_vbuffer, 6, 160*240);
+	gfx_SwapDraw();
+	//gfx_FillScreen(6);
 
 	fixed24 posX = int2fx(22), posY = int2fx(12);
 	int8_t dirX = -127, dirY = 0;
@@ -132,8 +135,8 @@ int main(void) {
 				F_perpWallDist = F_sideDistY - F_deltaDistY;
 			}
 
-			dbg_Debugger();
-			uint24_t line_height = int2fx(180) / F_perpWallDist;
+			//dbg_Debugger();
+			//uint24_t line_height = int2fx(180) / F_perpWallDist;
 			//dbg_Debugger();
 			//dbg_printf("%d, %d\n", raycast(x, F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY),
 			//	fxmul8abs(posX, F_deltaDistX));
@@ -155,8 +158,10 @@ int main(void) {
 
 			uint24_t texOff = tex_OffCalc(texX);
 
-			gfx_TexturedVertLine(x, line_height, texture_data + texOff);
+			gfx_TexturedVertLine(x, 46080/F_perpWallDist, texture_data + texOff);
 		}
+
+		gfx_SetPixel2_NoClip(0,180,1);
 
 		#ifdef DEBUG
 		dbg_printf("%lu\n", time_get_fps());
