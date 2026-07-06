@@ -29,20 +29,20 @@ int main(void) {
 
 	time_enable();
 	texture_init();
-	set_scaled_mode();
 
 	// Draw blue border
-	memset(gfx_vbuffer, 6, 160*240);
-	//gfx_FillScreen(6);
+	memset(gfx_vbuffer, 1, 160*240);
 	gfx_SwapDraw();
-	memset(gfx_vbuffer, 6, 160*240);
+	memset(gfx_vbuffer, 1, 160*240);
 	gfx_SwapDraw();
-	//gfx_FillScreen(6);
+
+	set_scaled_mode();
 
 	fixed24 posX = int2fx(22), posY = int2fx(12);
 	int8_t dirX = -127, dirY = 0;
 
 	uint8_t rotation = 0;
+	//disable_interlacing();
 
 	do {
 		key_update();
@@ -111,7 +111,7 @@ int main(void) {
 				if(F_sideDistX < F_sideDistY) {
 					F_sideDistX += F_deltaDistX;
 					mapX += stepX;
-					if(Map[mapY+(mapX<<5)] != 0) {
+					if(Map[mapY+(mapX*32)] != 0) {
 						side = false;
 						break;
 					}
@@ -119,7 +119,7 @@ int main(void) {
 				else {
 					F_sideDistY += F_deltaDistY;
 					mapY += stepY;
-					if(Map[mapY+(mapX<<5)] != 0) {
+					if(Map[mapY+(mapX*32)] != 0) {
 						side = true;
 						break;
 					}
@@ -161,13 +161,15 @@ int main(void) {
 			gfx_TexturedVertLine(x, 46080/F_perpWallDist, texture_data + texOff);
 		}
 
-		gfx_SetPixel2_NoClip(0,180,1);
+		//gfx_palette[1] = time_get_fps() << 11;
+		//timer_1_Counter = 0;
 
-		#ifdef DEBUG
-		dbg_printf("%lu\n", time_get_fps());
-		timer_1_Counter = 0;
-		#endif
+		//#ifdef DEBUG
+		//dbg_printf("%lu\n", time_get_fps());
+		//timer_1_Counter = 0;
+		//#endif
 
+		//gfx_Wait();
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
 

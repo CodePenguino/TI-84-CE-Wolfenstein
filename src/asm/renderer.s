@@ -47,8 +47,8 @@ _gfx_SetPixel2_NoClip:
 	add iy,sp
 
 	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
-	ld  bc,(iy+3)          ; bc = x
-	add hl,bc              ; hl += bc
+	ld  de,(iy+3)          ; de = x
+	add hl,de              ; hl += de
 	ld  c,(iy+6)           ; c = y
 	ld  b,160              ; b = lcdWidth / 2 = 160
 	mlt bc                 ; bc = b * c (y * 160)

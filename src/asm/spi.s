@@ -9,7 +9,6 @@
 	ld a,\param
 	call spiParam
 .endm
-;end macro
 
 ;macro SPI_PARAM16 param
 	;ld a, param >> 8
@@ -22,8 +21,6 @@
 	.section .text._set_scaled_mode
 	.global _set_scaled_mode
 	.type _set_scaled_mode, @function
-
-;	public _set_scaled_mode
 _set_scaled_mode:
 	SPI_CMD $2A      ; X left/right bounds
 	SPI_PARAM 0
@@ -58,7 +55,29 @@ _set_scaled_mode:
 	SPI_CMD $E4      ; Gate control
 	SPI_PARAM $27    ; 320 lines
 	SPI_PARAM $00    ; Start line 0
-	SPI_PARAM $14    ; Interlaced
+	SPI_PARAM 4      ; Interlaced
+
+	ret
+
+	.section .text._enable_interlacing
+	.global _enable_interlacing
+	.type _enable_interlacing, @function
+_enable_interlacing:
+	SPI_CMD $E4      ; Gate control
+	SPI_PARAM $27    ; 320 lines
+	SPI_PARAM $00    ; Start line 0
+	SPI_PARAM 4      ; Interlaced
+
+	ret
+
+	.section .text._disable_interlacing
+	.global _disable_interlacing
+	.type _disable_interlacing, @function
+_disable_interlacing:
+	SPI_CMD $E4      ; Gate control
+	SPI_PARAM $27    ; 320 lines
+	SPI_PARAM $00    ; Start line 0
+	SPI_PARAM 0      ; Not interlaced
 
 	ret
 

@@ -17,6 +17,8 @@
 extern "C" {
 #endif
 extern void set_scaled_mode();
+extern void enable_interlacing();
+extern void disable_interlacing();
 #ifdef __cplusplus
 }
 #endif
