@@ -68,8 +68,7 @@ __gfx_TexturedVertLine_Partial:
 	add iy,sp
 
 	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
-	ld  de,(iy+3)          ; de = x
-	add hl,de              ; hl += de
+	ld l,(iy+3)            ; hl += x
 
 	ld  a,0xEC             ; Sets ceiling color
 
@@ -133,8 +132,7 @@ __gfx_TexturedVertLine_Full:
 	add iy,sp
 
 	ld  hl,(CurrentBuffer) ; Set hl to current video buffer
-	ld  bc,(iy+3)          ; bc = x
-	add hl,bc              ; hl += bc
+	ld l,(iy+3)            ; hl += x
 
 	exx
 	ld  hl,(iy+9)          ; hl' = texture offset (in fixed point)

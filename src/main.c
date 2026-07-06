@@ -28,7 +28,7 @@ int main(void) {
 	gfx_SetPalette(global_palette, sizeof(global_palette), 0);
 
 	time_enable();
-	texture_init();
+	//texture_init();
 
 	// Draw blue border
 	memset(gfx_vbuffer, 1, 160*240);
@@ -105,8 +105,8 @@ int main(void) {
 
 			bool side = false; //was a NS or a EW wall hit?
 			//perform DDA
-			#pragma unroll(24)
-			for(uint8_t i = 24; i >= 0; i--) {
+			#pragma unroll(32)
+			for(uint8_t i = 32; i > 0; i--) {
 				//jump to next map square, either in x-direction, or in y-direction
 				if(F_sideDistX < F_sideDistY) {
 					F_sideDistX += F_deltaDistX;
@@ -158,7 +158,7 @@ int main(void) {
 
 			uint24_t texOff = tex_OffCalc(texX);
 
-			gfx_TexturedVertLine(x, 46080/F_perpWallDist, texture_data + texOff);
+			gfx_TexturedVertLine(x, 46080/F_perpWallDist, door_texture_data + texOff);
 		}
 
 		//gfx_palette[1] = time_get_fps() << 11;
@@ -174,7 +174,7 @@ int main(void) {
 	} while (!key_pressed(kb_2nd));
 
 	time_disable();
-	texture_disable();
+	//texture_disable();
 
 	// Reset the SPI to how it was before the program was run
 	asm("call $000384");
