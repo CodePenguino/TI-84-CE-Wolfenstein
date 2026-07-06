@@ -106,7 +106,7 @@ int main(void) {
 
 			bool side = false; //was a NS or a EW wall hit?
 			//perform DDA
-			#pragma unroll(32)
+			#pragma unroll
 			for(uint8_t i = 32; i > 0; i--) {
 				//jump to next map square, either in x-direction, or in y-direction
 				if(F_sideDistX < F_sideDistY) {
@@ -171,7 +171,6 @@ int main(void) {
 		//timer_1_Counter = 0;
 		//#endif
 
-		gfx_Wait();
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
 
