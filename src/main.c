@@ -63,10 +63,10 @@ int main(void) {
 			rotation += 4;
 		}
 
+		//dbg_Debugger();
 		dirX = lu_cosneg(rotation);
 		dirY = lu_sinneg(rotation);
 
-		//gfx_Wait();
 		for(uint8_t x = 0; x < 160; x++) {
 			//calculate ray position and direction
 			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
@@ -159,7 +159,8 @@ int main(void) {
 
 			uint24_t texOff = tex_OffCalc(texX);
 
-			gfx_TexturedVertLine(x, 46080/F_perpWallDist, door_texture_data + texOff);
+			uint24_t wall_height = 46080/F_perpWallDist;
+			gfx_TexturedVertLine(x, wall_height, door_texture_data + texOff);
 		}
 
 		//gfx_palette[1] = time_get_fps() << 11;
@@ -170,7 +171,7 @@ int main(void) {
 		//timer_1_Counter = 0;
 		//#endif
 
-		//gfx_Wait();
+		gfx_Wait();
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
 

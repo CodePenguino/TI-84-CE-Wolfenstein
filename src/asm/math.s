@@ -15,10 +15,8 @@ __getSinCos:
 	ld  e,a    ; e = angle
 	ld  a,128  ; a = 128
 	sub a,e    ; a -= angle (a = 128 - angle)
-	ld  de,0
-	ld  e,a    ; e = a
 	ld  hl,_SineTable
-	add hl,de
+	ld  l,a
 	ld  a,(hl)
 	bit 7,c    ; return if input is 0-127
 	ret z
@@ -39,10 +37,8 @@ __getSinCosNeg:
 	ld  e,a    ; e = angle
 	ld  a,128  ; a = 128
 	sub a,e    ; a -= angle (a = 128 - angle)
-	ld  de,0
-	ld  e,a    ; e = a
 	ld  hl,_SineTable
-	add hl,de
+	ld  l,a
 	ld  a,(hl)
 	bit 7,c    ; return if input is 0-127
 	ret nz
@@ -81,9 +77,10 @@ __texOffCalc:
 
 	ret
 
+	; Table is byte aligned for easier look-up math
 	.section .rodata._SineTable
 	.global _SineTable
-
+	.balign 256
 _SineTable:
 	; sin(x) * 128
 	db 0,3,6,9,13,16,19,22,25,28,31,34,37,40,43,46
