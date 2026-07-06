@@ -11,10 +11,11 @@
 #include "math/math.h"
 #include <debug.h>
 #include "gfx/spi.h"
-#include "gfx/texture.h"
+#include "gfx/texture/gfx.h"
 #include "math/lut.h"
 #include "ray/map.h"
 #include "ray/ray.h"
+#include <string.h>
 
 int main(void) {
 	// Calls _boot_InitializeHardware
