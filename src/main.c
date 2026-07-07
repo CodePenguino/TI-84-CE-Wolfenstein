@@ -39,7 +39,7 @@ int main(void) {
 
 	set_scaled_mode();
 
-	fixed24 posX = int2fx(22), posY = int2fx(12);
+	//fixed24 posX = int2fx(22), posY = int2fx(12);
 	int8_t dirX = -127, dirY = 0;
 
 	uint8_t rotation = 0;
@@ -70,8 +70,8 @@ int main(void) {
 		for(uint8_t x = 0; x < 160; x++) {
 			//calculate ray position and direction
 			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
-			fixed24 F_rayDirX = ((dirX<<1) + fxmul24(dirY<<1, cameraX));
-			fixed24 F_rayDirY = ((dirY<<1) - fxmul24(dirX<<1, cameraX));
+			F_rayDirX = ((dirX<<1) + fxmul24(dirY<<1, cameraX));
+			F_rayDirY = ((dirY<<1) - fxmul24(dirX<<1, cameraX));
 
 			//which box of the map we're in
 			uint8_t mapX = posX >> 8;
@@ -80,8 +80,8 @@ int main(void) {
 			uint24_t F_sideDistX;
 			uint24_t F_sideDistY;
 
-			uint24_t F_deltaDistX = div_lut[abs24(F_rayDirX)];
-			uint24_t F_deltaDistY = div_lut[abs24(F_rayDirY)];
+			F_deltaDistX = div_lut[abs24(F_rayDirX)];
+			F_deltaDistY = div_lut[abs24(F_rayDirY)];
 
 			int8_t stepX;
 			int8_t stepY;
@@ -103,6 +103,9 @@ int main(void) {
 				F_sideDistY = fxmul8abs((-posY)-1, F_deltaDistY);
 				stepY = 1;
 			}
+
+			//dbg_Debugger();
+			dbg_printf("%d\n", raycast(F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY));
 
 			bool side = false; //was a NS or a EW wall hit?
 			//perform DDA
@@ -137,10 +140,6 @@ int main(void) {
 			}
 
 			//dbg_Debugger();
-			//uint24_t line_height = int2fx(180) / F_perpWallDist;
-			//dbg_Debugger();
-			//dbg_printf("%d, %d\n", raycast(x, F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY),
-			//	fxmul8abs(posX, F_deltaDistX));
 
 			uint8_t texX;
 			if(!side) {

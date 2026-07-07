@@ -270,6 +270,7 @@ converts:
 outputs:
   - type: c
     include-file: gfx.h
+    const: true
     palettes:
       - global_palette
     converts:

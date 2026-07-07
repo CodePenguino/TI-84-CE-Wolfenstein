@@ -7,7 +7,15 @@
 extern "C" {
 #endif
 
-extern uint24_t raycast(uint8_t x, fixed24 F_rayDirX, fixed24 F_rayDirY,
+fixed24 posX = int2fx(22), posY = int2fx(12);
+
+fixed24 F_rayDirX;
+fixed24 F_rayDirY;
+
+uint24_t F_deltaDistX;
+uint24_t F_deltaDistY;
+
+extern uint24_t raycast(fixed24 F_rayDirX, fixed24 F_rayDirY,
     uint24_t F_deltaDistX, uint24_t F_deltaDistY, fixed24 posX, fixed24 posY);
 
 #ifdef __cplusplus
