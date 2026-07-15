@@ -1,7 +1,11 @@
     .assume adl=1
 
+	.include "src/asm/fixed.asm"
+
+MapSize := 24
+
 ; a * bc, stored in hl (in fixed point)
-.macro MUL8CODE
+.macro MUL8CODE_RAY
 	; hl = a*c (fractional)
 	ld h,a
 	ld l,c
@@ -21,53 +25,48 @@
 
     ; F_rayDirX is negative
 SIDEDISTXMUL_NEG:
-    MUL8CODE ; result stored in hl (F_sideDistX)
+    MUL8CODE_RAY ; result stored in hl (F_sideDistX)
 
-    ; e = stepX
-    ld de,-32
+    ; de = stepX
+    ld de,-MapSize
     ret
 
     ; F_rayDirX is positive
 SIDEDISTXMUL_POS:
     ; (-pos)-1
-	; -(pos+1)
-    ;neg
-    ;dec a
-	inc a
-	neg
+    neg
+    dec a
 
-    MUL8CODE
+    MUL8CODE_RAY
 
-    ; e = stepX
-    ld de,32
-	and a,0     ; ensure that z flag is set
+    ; de = stepX
+    ld de,MapSize
+	cp a,a     ; ensure that z flag is set
     ret
 
     ; F_rayDirY is negative
 SIDEDISTYMUL_NEG:
-    MUL8CODE ; result stored in hl (F_sideDistX)
+    MUL8CODE_RAY ; result stored in hl (F_sideDistX)
 
-    ; e = stepY
+    ; de = stepY
     ld de,-1
     ret
 
     ; F_rayDirY is positive
 SIDEDISTYMUL_POS:
     ; (-pos)-1
-	; -(pos+1)
-    ;neg
-    ;dec a
-	inc a
-	neg
+    neg
+    dec a
 
-    MUL8CODE
+    MUL8CODE_RAY
 
-    ; e = stepY
+    ; de = stepY
     ld de,1
-	and a,0     ; ensure that z flag is set
+	cp a,a     ; ensure that z flag is set
     ret
 
 ; ------------------------------------------------
+
 
 	.section .text._raycast
 	.global _raycast
@@ -82,15 +81,11 @@ _raycast:
 
     ; ---------- F_sideDistX setup ----------
 
-    ; e = mapX (posX high byte)
-	;ld de,0
-	;ld de,(iy+18)
-	ld de,(iy+15)
-	ld e,32
-    ;ld e,(iy+16)
-	;ld d,32
+    ; de = mapX (posX high byte)
+	ld d,(iy+16)
+	ld e,MapSize
 	mlt de
-	add ix,de    ; offset map pointer by mapX*32
+	add ix,de    ; offset map pointer by mapX*MapSize
 
 
     ; a = (uint8_t)posX
@@ -100,11 +95,10 @@ _raycast:
     ld bc,(iy+9)
 
     ; d = F_rayDirX (highest byte)
-    ld d,(iy+4)
-	;ld de,(iy+3)
+    ld d,(iy+5)
 
     ; hl = F_sideDistX
-    ; e = stepX
+    ; de = stepX
     bit 7,d
     call z,SIDEDISTXMUL_POS ; F_rayDirX is positive
     call nz,SIDEDISTXMUL_NEG ; F_rayDirX is negative
@@ -126,8 +120,7 @@ _raycast:
     ld bc,(iy+12)
 
     ; d' = F_rayDirY (highest byte)
-    ld d,(iy+7)
-	;ld de,(iy+6)
+    ld d,(iy+8)
 
     ; hl' = F_sideDistY
     ; e' = stepY
@@ -145,17 +138,15 @@ RAYLOOP:
 	exx
 	ld a,h
 	exx
-	or a,a ; carry = 0
 	cp a,h ; compare high bits (a-h) (F_sideDistY - F_sideDistX)
-	jp c,SIDEDISTXBIGGER      ; jump if F_sideDistX high bit is bigger (result above is negative)
-	jp nz,SIDEDISTYBIGGER     ; jump if high bits are not the same (skip check below)
+	jr c,SIDEDISTXBIGGER      ; jump if F_sideDistX high bit is bigger (result above is negative)
+	jr nz,SIDEDISTYBIGGER     ; jump if high bits are not the same (skip check below)
 	; compare low bits if high bits are equal
 	exx
 	ld a,l
 	exx
 	cp a,l ; compare low bits (a-l) (F_sideDistY - F_sideDistX)
-	jp c,SIDEDISTXBIGGER ; jump if F_sideDistX is bigger (result above is negative)
-	;jp SIDEDISTYBIGGER
+	jr c,SIDEDISTXBIGGER ; jump if F_sideDistX is bigger (result above is negative)
 	; otherwise...
 
 SIDEDISTYBIGGER:
@@ -165,9 +156,15 @@ SIDEDISTYBIGGER:
 	; Check if we hit a wall
 	ld a,(ix)
 	or a,a
-	jp z,RAYLOOP ; not hit a wall? jump back to beginning
-	jp ENDOFLOOP_Y ; else, jump to end
-	;jp nz,ENDOFLOOP_X
+	jr z,RAYLOOP ; not hit a wall? jump back to beginning
+	;jr ENDOFLOOP_Y ; else, jump to end
+
+ENDOFLOOP_Y:
+	; hl -= bc
+	sbc hl,bc
+
+	pop ix
+    ret
 
 SIDEDISTXBIGGER:
 	exx
@@ -181,62 +178,41 @@ SIDEDISTXBIGGER:
 	; Check if we hit a wall
 	ld a,(ix)
 	or a,a
-	jp z,RAYLOOP
-	jp ENDOFLOOP_X
-	;jp nz,ENDOFLOOP_X
-
-
-ENDOFLOOP_Y:
-	; hl -= bc
-	or a,a
-	sbc hl,bc
-
-	pop ix
-    ret
+	jr z,RAYLOOP
+	;jr ENDOFLOOP_X
 
 ENDOFLOOP_X:
 	; hl -= bc
-	exx ; swap
-	or a,a
+	exx       ; swap
 	sbc hl,bc
 
 	pop ix
 	ret
 
-
 	.section .rodata._Map
 	.global _Map
-	.balign 256
 _Map:
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
-	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,2,2,2,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1
+	db 1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,3,0,0,0,3,0,0,0,1
+	db 1,0,0,0,0,0,2,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,2,2,0,2,2,0,0,0,0,3,0,3,0,3,0,0,0,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,4,0,0,0,0,5,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,4,0,4,0,0,0,0,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,4,0,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,4,4,4,4,4,4,4,4,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1
+	db 1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1

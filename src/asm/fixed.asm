@@ -72,8 +72,9 @@ AFTER_CHECK2MUL8:
 
 	MUL8CODE
 
-	scf ; reset carry flag
-	ccf
+	;scf ; reset carry flag
+	;ccf
+	or a,a
 	ex de,hl
 	sbc hl,hl
 	sbc hl,de ; hl is inverted
@@ -186,7 +187,8 @@ CHECK1:
 	ld b,h
 	ld c,l
 	;scf
-	ccf ; ensure carry = 0
+	;ccf ; ensure carry = 0
+	or a,a
 
 	inc a
 
@@ -216,6 +218,7 @@ INVMUL24:
 
 	; Negate the result
 	;ccf
+	or a,a
 	ex de,hl
 	sbc hl,hl
 	sbc hl,de
