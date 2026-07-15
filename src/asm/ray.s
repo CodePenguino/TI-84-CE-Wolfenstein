@@ -4,31 +4,12 @@
 
 MapSize := 24
 
-; a * bc, stored in hl (in fixed point)
-.macro MUL8CODE_RAY
-	; hl = a*c (fractional)
-	ld h,a
-	ld l,c
-	mlt hl
-
-	; hl /= 256
-	ld l,h
-	ld h,0
-
-	; de = a*b (whole)
-	ld d,a
-	ld e,b
-	mlt de
-
-	add hl,de
-.endm
-
     ; F_rayDirX is negative
 SIDEDISTXMUL_NEG:
-    MUL8CODE_RAY ; result stored in hl (F_sideDistX)
+    MUL8CODE ; result stored in hl (F_sideDistX)
 
-    ; de = stepX
-    ld de,-MapSize
+    ; bc = stepX
+    ld bc,-MapSize
     ret
 
     ; F_rayDirX is positive
@@ -37,19 +18,19 @@ SIDEDISTXMUL_POS:
     neg
     dec a
 
-    MUL8CODE_RAY
+    MUL8CODE
 
-    ; de = stepX
-    ld de,MapSize
+    ; bc = stepX
+    ld bc,MapSize
 	cp a,a     ; ensure that z flag is set
     ret
 
     ; F_rayDirY is negative
 SIDEDISTYMUL_NEG:
-    MUL8CODE_RAY ; result stored in hl (F_sideDistX)
+    MUL8CODE ; result stored in hl (F_sideDistX)
 
-    ; de = stepY
-    ld de,-1
+    ; bc = stepY
+    ld bc,-1
     ret
 
     ; F_rayDirY is positive
@@ -58,10 +39,10 @@ SIDEDISTYMUL_POS:
     neg
     dec a
 
-    MUL8CODE_RAY
+    MUL8CODE
 
-    ; de = stepY
-    ld de,1
+    ; bc = stepY
+    ld bc,1
 	cp a,a     ; ensure that z flag is set
     ret
 
@@ -91,15 +72,15 @@ _raycast:
     ; a = (uint8_t)posX
     ld a,(iy+15)
 
-    ; bc = F_deltaDistX
-    ld bc,(iy+9)
+    ; de = F_deltaDistX
+    ld de,(iy+9)
 
-    ; d = F_rayDirX (highest byte)
-    ld d,(iy+5)
+    ; b = F_rayDirX (highest byte)
+    ld b,(iy+5)
 
     ; hl = F_sideDistX
-    ; de = stepX
-    bit 7,d
+    ; bc = stepX
+    bit 7,b
     call z,SIDEDISTXMUL_POS ; F_rayDirX is positive
     call nz,SIDEDISTXMUL_NEG ; F_rayDirX is negative
 
@@ -116,15 +97,15 @@ _raycast:
     ; a' = (uint8_t)posY
     ld a,(iy+18)
 
-    ; bc' = F_deltaDistY
-    ld bc,(iy+12)
+    ; de' = F_deltaDistY
+    ld de,(iy+12)
 
-    ; d' = F_rayDirY (highest byte)
-    ld d,(iy+8)
+    ; b' = F_rayDirY (highest byte)
+    ld b,(iy+8)
 
     ; hl' = F_sideDistY
-    ; e' = stepY
-    bit 7,d
+    ; bc' = stepY
+    bit 7,b
     call z,SIDEDISTYMUL_POS ; F_rayDirY is positive
     call nz,SIDEDISTYMUL_NEG ; F_rayDirY is negative
 
@@ -150,8 +131,8 @@ RAYLOOP:
 	; otherwise...
 
 SIDEDISTYBIGGER:
-	add hl,bc ; F_sideDistX += F_deltaDistX
-	add ix,de ; map pointer += stepX
+	add hl,de ; F_sideDistX += F_deltaDistX
+	add ix,bc ; map pointer += stepX
 
 	; Check if we hit a wall
 	ld a,(ix)
@@ -160,8 +141,8 @@ SIDEDISTYBIGGER:
 	;jr ENDOFLOOP_Y ; else, jump to end
 
 ENDOFLOOP_Y:
-	; hl -= bc
-	sbc hl,bc
+	; hl -= de
+	sbc hl,de
 
 	pop ix
     ret
@@ -169,8 +150,8 @@ ENDOFLOOP_Y:
 SIDEDISTXBIGGER:
 	exx
 
-	add hl,bc ; F_sideDistY += F_deltaDistY
-	add ix,de ; map pointer += stepY
+	add hl,de ; F_sideDistY += F_deltaDistY
+	add ix,bc ; map pointer += stepY
 
 	; Unswap registers
 	exx
@@ -182,9 +163,9 @@ SIDEDISTXBIGGER:
 	;jr ENDOFLOOP_X
 
 ENDOFLOOP_X:
-	; hl -= bc
+	; hl -= de
 	exx       ; swap
-	sbc hl,bc
+	sbc hl,de
 
 	pop ix
 	ret

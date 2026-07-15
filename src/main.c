@@ -57,10 +57,10 @@ int main(void) {
 			posY -= fxmul8(dirY, 128);
 		}
 		if(key_pressed(kb_Right)) {
-			rotation -= 4;
+			rotation -= 2;
 		}
 		if(key_pressed(kb_Left)) {
-			rotation += 4;
+			rotation += 2;
 		}
 
 		dirX = lu_cosneg(rotation);

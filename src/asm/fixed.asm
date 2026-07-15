@@ -1,5 +1,6 @@
 	.assume adl=1
 
+; hl = de * a
 .macro MUL8CODE
 	; hl = a*e (fractional)
 	ld h,a
