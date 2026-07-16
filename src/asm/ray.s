@@ -29,7 +29,7 @@ SIDEDISTXMUL_POS:
 SIDEDISTYMUL_NEG:
     MUL8CODE ; result stored in hl (F_sideDistX)
 
-    ; bc = stepY
+    ; bc' = stepY
     ld bc,-1
     ret
 
@@ -41,7 +41,7 @@ SIDEDISTYMUL_POS:
 
     MUL8CODE
 
-    ; bc = stepY
+    ; bc' = stepY
     ld bc,1
 	cp a,a     ; ensure that z flag is set
     ret
@@ -75,8 +75,8 @@ _raycast:
     ; de = F_deltaDistX
     ld de,(iy+9)
 
-    ; b = F_rayDirX (highest byte)
-    ld b,(iy+5)
+    ; bc = F_rayDirX
+    ld bc,(iy+3)
 
     ; hl = F_sideDistX
     ; bc = stepX
@@ -100,8 +100,8 @@ _raycast:
     ; de' = F_deltaDistY
     ld de,(iy+12)
 
-    ; b' = F_rayDirY (highest byte)
-    ld b,(iy+8)
+    ; bc' = F_rayDirY
+    ld bc,(iy+6)
 
     ; hl' = F_sideDistY
     ; bc' = stepY
@@ -144,6 +144,43 @@ ENDOFLOOP_Y:
 	; hl -= de
 	sbc hl,de
 
+	; bc = hl (F_perpWallDist)
+	ld bc,0
+	ld a,c ; a = 0 (for multiplication later...)
+	ld b,h
+	ld c,l
+
+	push hl
+
+	; de = F_rayDirY
+	ld de,(iy+6)
+
+	; hl = bc*de
+	call CHECK2
+
+	; a = (uint8_t)hl
+	ld a,l
+	add a,(iy+18)
+
+	bit 7,(iy+5)
+	jr nz,AFTER_FLIP_CHECK_Y ; skip these lines if F_rayDirX is negative
+
+	neg
+	dec a
+
+AFTER_FLIP_CHECK_Y:
+	; convert 0-255 range to 0-63 range
+	and a,252
+	ld d,a
+	ld e,16
+	mlt de
+
+	ld ix,(_texture_pointer)
+	add ix,de
+	ld (_texture_pointer),ix
+
+	pop hl
+
 	pop ix
     ret
 
@@ -166,6 +203,41 @@ ENDOFLOOP_X:
 	; hl -= de
 	exx       ; swap
 	sbc hl,de
+
+	; bc = hl (F_perpWallDist)
+	ld bc,0
+	ld a,c ; a = 0 (for multiplication later...)
+	ld b,h
+	ld c,l
+
+	push hl
+
+	; de = F_rayDirX
+	ld de,(iy+3)
+
+	; hl = bc*de
+	call CHECK2
+	ld a,l
+	add a,(iy+15) ; a += posX
+
+	bit 7,(iy+8)
+	jr z,AFTER_FLIP_CHECK_Y ; skip these lines if F_rayDirY is negative
+
+	neg
+	dec a
+
+AFTER_FLIP_CHECK_X:
+	; convert 0-255 range to 0-63 range
+	and a,252
+	ld d,a
+	ld e,16
+	mlt de
+
+	ld ix,(_texture_pointer)
+	add ix,de
+	ld (_texture_pointer),ix
+
+	pop hl
 
 	pop ix
 	ret

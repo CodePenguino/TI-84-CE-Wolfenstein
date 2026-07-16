@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include "../math/fixed.h"
+#include "../gfx/texture.h"
 
 #ifdef __cplusplus
 extern "C" {

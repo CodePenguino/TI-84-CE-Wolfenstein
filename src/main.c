@@ -57,10 +57,10 @@ int main(void) {
 			posY -= fxmul8(dirY, 128);
 		}
 		if(key_pressed(kb_Right)) {
-			rotation -= 2;
+			rotation -= 4;
 		}
 		if(key_pressed(kb_Left)) {
-			rotation += 2;
+			rotation += 4;
 		}
 
 		dirX = lu_cosneg(rotation);
@@ -148,13 +148,13 @@ int main(void) {
 			}
 
 			uint8_t texX;
-			if(!side) {
+			if(!side) { // F_sideDistY is bigger
 				texX = posY + fxmul24(F_perpWallDist, F_rayDirY);
 				//if(F_rayDirX > 0) {
 				if(stepX != -1) {
 					texX = (-texX)-1;
 				}
-			} else {
+			} else { // F_sideDistX is bigger
 				texX = posX + fxmul24(F_perpWallDist, F_rayDirX);
 				//if(F_rayDirY < 0) {
 				if(stepY != 1) {
@@ -168,7 +168,8 @@ int main(void) {
 			//uint24_t wall_height = 46080/F_perpWallDist;
 			uint24_t wall_height = 46080/asm_perpWallDist;
 			//gfx_TexturedVertLine(x, wall_height, door_texture_data + texOff);
-			gfx_TexturedVertLine(x, wall_height, door_texture_data + 64);
+			gfx_TexturedVertLine(x, wall_height, texture_pointer);
+			texture_pointer = (uint8_t*)door_texture_data;
 		}
 
 		//gfx_palette[1] = time_get_fps() << 11;

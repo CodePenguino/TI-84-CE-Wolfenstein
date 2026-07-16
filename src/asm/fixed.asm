@@ -129,15 +129,16 @@ _fxmul24abs:
 	ret
 
 .macro MUL24CODE
+	push de
 	; ------ Whole bit of a ------
-	; hl = a*d
+	; hl = b*d
 	ld h,b
 	ld l,d
 	mlt hl
 	ld h,l
 	ld l,0
 
-	; de = a*e
+	; de = b*e
 	ld d,b
 	mlt de
 
@@ -145,8 +146,10 @@ _fxmul24abs:
 
 	; ------ Fractional bit of a ------
 	;ld de,(iy+6)
-	ld d,a
+	;ld d,a
+	pop de
 
+	push de
 	; de = d*c (whole)
 	ld e,c
 	mlt de
@@ -154,7 +157,8 @@ _fxmul24abs:
 	add hl,de ; add to result
 
 	; load e
-	ld e,(iy+6) ; 4 cycles
+	pop de
+	;ld e,(iy+6) ; 4 cycles
 
 	; de = c*e (fractional)
 	ld d,c
@@ -165,6 +169,7 @@ _fxmul24abs:
 	add hl,de ; add to result
 .endm
 
+; hl = bc * de
 	.section .text._fxmul24
 	.global _fxmul24
 	.type _fxmul24, @function
@@ -175,18 +180,22 @@ _fxmul24:
 	ld bc,(iy+3) ; bc = first
 	ld de,(iy+6) ; de = second
 
+FXMUL24_FROMASM: ; used to call only from assembly...
 	ld a,0
 
 CHECK1:
 	bit 7,b
 	jr z,CHECK2
 
+	or a,a
 	; invert bc if it's negative
 	sbc hl,hl
 	sbc hl,bc
 
+	ld bc,0
 	ld b,h
 	ld c,l
+	ld (iy+3),c ; 4 cycles
 	;scf
 	;ccf ; ensure carry = 0
 	or a,a
@@ -198,6 +207,7 @@ CHECK2:
 	jr z,AFTER_CHECK2
 
 	; invert de if it's negative
+	or a,a
 	sbc hl,hl
 	sbc hl,de
 	ex de,hl
