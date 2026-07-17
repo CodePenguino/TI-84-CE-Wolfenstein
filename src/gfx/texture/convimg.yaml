@@ -264,6 +264,8 @@ converts:
     palette: global_palette
     transparent-color-index: 255
     width-and-height: false
+    rotate: 90
+    flip-x: true
     images:
       - door_texture.png
 

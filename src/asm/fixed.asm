@@ -198,7 +198,7 @@ CHECK1:
 	ld (iy+3),c ; 4 cycles
 	;scf
 	;ccf ; ensure carry = 0
-	or a,a
+	;or a,a
 
 	inc a
 

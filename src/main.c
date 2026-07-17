@@ -73,107 +73,20 @@ int main(void) {
 			F_rayDirX = ((dirX<<1) + fxmul24(dirY<<1, cameraX));
 			F_rayDirY = ((dirY<<1) - fxmul24(dirX<<1, cameraX));
 
-			//which box of the map we're in
-			//uint8_t mapX = posX >> 8;
-			//uint8_t mapY = posY >> 8;
-
-			//uint24_t F_sideDistX;
-			//uint24_t F_sideDistY;
-
 			F_deltaDistX = div_lut[abs24(F_rayDirX)];
 			F_deltaDistY = div_lut[abs24(F_rayDirY)];
 
-			/*int8_t stepX;
-			int8_t stepY;
-
-			//calculate step and initial sideDist
-			if(F_rayDirX < 0) {
-				F_sideDistX = fxmul8abs(posX, F_deltaDistX);
-				stepX = -1;
-			}
-			else {
-				F_sideDistX = fxmul8abs((-posX)-1, F_deltaDistX);
-				stepX = 1;
-			}
-			if(F_rayDirY < 0) {
-				F_sideDistY = fxmul8abs(posY, F_deltaDistY);
-				stepY = -1;
-			}
-			else {
-				F_sideDistY = fxmul8abs((-posY)-1, F_deltaDistY);
-				stepY = 1;
-			}
-
-			bool side = false; //was a NS or a EW wall hit?
-			//perform DDA
-			//#pragma unroll
-			//for(uint8_t i = 32; i > 0; i--) {
-			while(1) {
-				//jump to next map square, either in x-direction, or in y-direction
-				if(F_sideDistX <= F_sideDistY) {
-					F_sideDistX += F_deltaDistX;
-					mapX += stepX;
-					if(Map[mapY+(mapX*32)] != 0) {
-						side = false;
-						break;
-					}
-				}
-				else {
-					F_sideDistY += F_deltaDistY;
-					mapY += stepY;
-					if(Map[mapY+(mapX*32)] != 0) {
-						side = true;
-						break;
-					}
-				}
-			}
-
-			uint24_t F_perpWallDist;
-
-			if(!side) {
-				F_perpWallDist = F_sideDistX - F_deltaDistX;
-			}
-			else {
-				F_perpWallDist = F_sideDistY - F_deltaDistY;
-			}
-
 			uint24_t asm_perpWallDist = raycast(F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY);
-
-			if(asm_perpWallDist != F_perpWallDist) {
-				dbg_printf("Expected: %d\n", F_perpWallDist);
-				dbg_printf("Vars: %d, %d, %d, %d, %d, %d\n", F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY);
-				dbg_Debugger();
-
-				raycast(F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY);
-			}
-
-			uint8_t texX;
-			if(!side) { // F_sideDistY is bigger
-				texX = posY + fxmul24(F_perpWallDist, F_rayDirY);
-				//if(F_rayDirX > 0) {
-				if(stepX != -1) {
-					texX = (-texX)-1;
-				}
-			} else { // F_sideDistX is bigger
-				texX = posX + fxmul24(F_perpWallDist, F_rayDirX);
-				//if(F_rayDirY < 0) {
-				if(stepY != 1) {
-					texX = (-texX)-1;
-				}
-			}
-
-			uint24_t texOff = tex_OffCalc(texX);*/
-
-			uint24_t asm_perpWallDist = raycast(F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY);
-			//uint24_t wall_height = 46080/F_perpWallDist;
 			uint24_t wall_height = 46080/asm_perpWallDist;
-			//gfx_TexturedVertLine(x, wall_height, door_texture_data + texOff);
+
 			gfx_TexturedVertLine(x, wall_height, texture_pointer);
 			texture_pointer = (uint8_t*)door_texture_data;
 		}
 
+		gfx_SetPixel2_NoClip(0, 181, time_get_fps());
+
 		//gfx_palette[1] = time_get_fps() << 11;
-		//timer_1_Counter = 0;
+		timer_1_Counter = 0;
 
 		//#ifdef DEBUG
 		//dbg_printf("%lu\n", time_get_fps());
