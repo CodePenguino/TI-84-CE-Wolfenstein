@@ -144,9 +144,20 @@ ENDOFLOOP_Y:
 	; hl -= de
 	sbc hl,de
 
+	ld ix,(_texture_pointer)
+
+	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
+	dec a
+	ld d,$20
+	ld e,a
+	mlt de
+	ld d,e
+	ld e,0
+	add ix,de
+
 	; bc = hl (F_perpWallDist)
 	ld bc,0
-	;ld a,c ; a = 0 (for multiplication later...)
+	ld a,c ; a = 0 (for multiplication later...)
 	ld b,h
 	ld c,l
 
@@ -154,10 +165,6 @@ ENDOFLOOP_Y:
 
 	; de = F_rayDirY
 	ld de,(iy+6)
-
-	push af
-
-	ld a,0
 
 	; hl = bc*de
 	call CHECK2
@@ -179,17 +186,6 @@ AFTER_FLIP_CHECK_Y:
 	ld e,16
 	mlt de
 
-	ld ix,(_texture_pointer)
-	add ix,de
-
-	pop af
-	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
-	dec a
-	ld d,$20
-	ld e,a
-	mlt de
-	ld d,e
-	ld e,0
 	add ix,de
 
 	ld (_texture_pointer),ix
@@ -219,9 +215,20 @@ ENDOFLOOP_X:
 	exx       ; swap
 	sbc hl,de
 
+	ld ix,(_texture_pointer)
+
+	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
+	dec a
+	ld d,$20
+	ld e,a
+	mlt de
+	ld d,e
+	ld e,0
+	add ix,de
+
 	; bc = hl (F_perpWallDist)
 	ld bc,0
-	;ld a,c ; a = 0 (for multiplication later...)
+	ld a,c ; a = 0 (for multiplication later...)
 	ld b,h
 	ld c,l
 
@@ -229,10 +236,6 @@ ENDOFLOOP_X:
 
 	; de = F_rayDirX
 	ld de,(iy+3)
-
-	push af
-
-	ld a,0
 
 	; hl = bc*de
 	call CHECK2
@@ -252,17 +255,6 @@ AFTER_FLIP_CHECK_X:
 	ld e,16
 	mlt de
 
-	ld ix,(_texture_pointer)
-	add ix,de
-
-	pop af
-	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
-	dec a
-	ld d,$20
-	ld e,a
-	mlt de
-	ld d,e
-	ld e,0
 	add ix,de
 
 	; offset for shadows...

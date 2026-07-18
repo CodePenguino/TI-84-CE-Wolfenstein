@@ -39,11 +39,9 @@ int main(void) {
 
 	set_scaled_mode();
 
-	//fixed24 posX = int2fx(22), posY = int2fx(12);
 	int8_t dirX = -127, dirY = 0;
 
 	uint8_t rotation = 0;
-	//disable_interlacing();
 
 	do {
 		key_update();
