@@ -39,7 +39,7 @@ int main(void) {
 
 	set_scaled_mode();
 
-	int8_t dirX = -127, dirY = 0;
+	int8_t dirX, dirY;
 
 	uint8_t rotation = 0;
 
@@ -64,8 +64,7 @@ int main(void) {
 		dirX = lu_cosneg(rotation);
 		dirY = lu_sinneg(rotation);
 
-		//gfx_Wait();
-		for(uint8_t x = 0; x < 160; x++) {
+		for(uint8_t x = 159; x < 255; x--) {
 			//calculate ray position and direction
 			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
 			F_rayDirX = ((dirX<<1) + fxmul24(dirY<<1, cameraX));
@@ -81,7 +80,7 @@ int main(void) {
 			texture_pointer = (uint8_t*)door_texture_data;
 		}
 
-		gfx_SetPixel2_NoClip(0, 181, time_get_fps());
+		gfx_SetPixel2_NoClip(0, 180, time_get_fps());
 
 		//gfx_palette[1] = time_get_fps() << 11;
 		timer_1_Counter = 0;

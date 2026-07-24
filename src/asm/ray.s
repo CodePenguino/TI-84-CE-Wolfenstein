@@ -146,17 +146,19 @@ ENDOFLOOP_Y:
 
 	ld ix,(_texture_pointer)
 
+	ld b,0
+	ld c,b
+
 	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
 	dec a
 	ld d,$20
 	ld e,a
 	mlt de
 	ld d,e
-	ld e,0
+	ld e,c ; e = 0
 	add ix,de
 
 	; bc = hl (F_perpWallDist)
-	ld bc,0
 	ld a,c ; a = 0 (for multiplication later...)
 	ld b,h
 	ld c,l
@@ -217,17 +219,19 @@ ENDOFLOOP_X:
 
 	ld ix,(_texture_pointer)
 
+	ld b,0
+	ld c,b
+
 	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
 	dec a
 	ld d,$20
 	ld e,a
 	mlt de
 	ld d,e
-	ld e,0
+	ld e,c ; e = 0
 	add ix,de
 
 	; bc = hl (F_perpWallDist)
-	ld bc,0
 	ld a,c ; a = 0 (for multiplication later...)
 	ld b,h
 	ld c,l
