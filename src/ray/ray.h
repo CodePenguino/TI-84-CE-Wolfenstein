@@ -16,8 +16,7 @@ fixed24 F_rayDirY;
 uint24_t F_deltaDistX;
 uint24_t F_deltaDistY;
 
-extern uint24_t raycast(fixed24 F_rayDirX, fixed24 F_rayDirY,
-    uint24_t F_deltaDistX, uint24_t F_deltaDistY, fixed24 posX, fixed24 posY);
+extern uint24_t raycast();
 
 #ifdef __cplusplus
 }

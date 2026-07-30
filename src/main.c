@@ -13,7 +13,6 @@
 #include "gfx/spi.h"
 #include "gfx/texture/gfx.h"
 #include "math/lut.h"
-#include "ray/map.h"
 #include "ray/ray.h"
 #include <string.h>
 
@@ -32,10 +31,8 @@ int main(void) {
 	//texture_init();
 
 	// Draw blue border
-	memset(gfx_vbuffer, 1, 160*240);
-	gfx_SwapDraw();
-	memset(gfx_vbuffer, 1, 160*240);
-	gfx_SwapDraw();
+	memset(gfx_vram, 1, 160*240);
+	memset(gfx_vram+(320*240), 1, 160*240);
 
 	set_scaled_mode();
 
@@ -64,26 +61,25 @@ int main(void) {
 		dirX = lu_cosneg(rotation);
 		dirY = lu_sinneg(rotation);
 
-		for(uint8_t x = 159; x < 255; x--) {
+		for(RENDER_x = 0; RENDER_x < 160; RENDER_x++) {
 			//calculate ray position and direction
-			fixed24 cameraX = camera_x_lut[x]; //x-coordinate in camera space
-			F_rayDirX = ((dirX<<1) + fxmul24(dirY<<1, cameraX));
-			F_rayDirY = ((dirY<<1) - fxmul24(dirX<<1, cameraX));
+			fixed24 cameraX = camera_x_lut[RENDER_x]; //x-coordinate in camera space
+			F_rayDirX = ((dirX*2) + fxmul24(dirY*2, cameraX));
+			F_rayDirY = ((dirY*2) - fxmul24(dirX*2, cameraX));
 
 			F_deltaDistX = div_lut[abs24(F_rayDirX)];
 			F_deltaDistY = div_lut[abs24(F_rayDirY)];
 
-			uint24_t asm_perpWallDist = raycast(F_rayDirX, F_rayDirY, F_deltaDistX, F_deltaDistY, posX, posY);
-			uint24_t wall_height = 46080/asm_perpWallDist;
+            RENDER_length = 46080/raycast();
 
-			gfx_TexturedVertLine(x, wall_height, texture_pointer);
+			gfx_TexturedVertLine();
 			texture_pointer = (uint8_t*)door_texture_data;
 		}
 
-		gfx_SetPixel2_NoClip(0, 180, time_get_fps());
+		//gfx_SetPixel2_NoClip(0, 180, time_get_fps());
 
 		//gfx_palette[1] = time_get_fps() << 11;
-		timer_1_Counter = 0;
+		//timer_1_Counter = 0;
 
 		//#ifdef DEBUG
 		//dbg_printf("%lu\n", time_get_fps());

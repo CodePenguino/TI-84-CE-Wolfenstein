@@ -11,9 +11,10 @@
 	ld l,h
 	ld h,0
 
-	; bc = a*d (whole)
-	ld b,a
-	ld c,d
+    ; hl += d*a (whole)
+
+	ld b,d
+	ld c,a
 	mlt bc
 
 	add hl,bc
@@ -129,6 +130,9 @@ _fxmul24abs:
 	ret
 
 .macro MUL24CODE
+	; Ensure that a = 0
+	sub a,a
+
 	push de
 	; ------ Whole bit of a ------
 	; hl = b*d
@@ -136,7 +140,7 @@ _fxmul24abs:
 	ld l,d
 	mlt hl
 	ld h,l
-	ld l,0
+	ld l,a ; l = 0
 
 	; de = b*e
 	ld d,b
@@ -165,7 +169,7 @@ _fxmul24abs:
 	mlt de
 	; de /= 256
 	ld e,d
-	ld d,0
+	ld d,a ; d = 0
 	add hl,de ; add to result
 .endm
 
@@ -181,7 +185,8 @@ _fxmul24:
 	ld de,(iy+6) ; de = second
 
 FXMUL24_FROMASM: ; used to call only from assembly...
-	ld a,0
+	;ld a,0
+    sub a,a
 
 CHECK1:
 	bit 7,b
@@ -195,10 +200,7 @@ CHECK1:
 	ld bc,0
 	ld b,h
 	ld c,l
-	ld (iy+3),c ; 4 cycles
-	;scf
-	;ccf ; ensure carry = 0
-	;or a,a
+	;ld (iy+3),c ; 4 cycles
 
 	inc a
 
@@ -211,7 +213,7 @@ CHECK2:
 	sbc hl,hl
 	sbc hl,de
 	ex de,hl
-	ld (iy+6),e ; 4 cycles
+	;ld (iy+6),e ; 4 cycles
 
 	inc a
 

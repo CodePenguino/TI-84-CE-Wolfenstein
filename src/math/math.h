@@ -30,14 +30,13 @@ extern "C" {
 #endif
 extern int8_t _getSinCos();
 extern int8_t _getSinCosNeg();
-extern int24_t _abs24(uint24_t x);
-extern int24_t _texOffCalc();
+extern uint24_t _abs24(uint24_t x);
 #ifdef __cplusplus
 }
 #endif
 
 static inline int24_t abs24(uint24_t x) {
-	//asm("ld de, (%0)" :: "r" (x));
+	//asm("ld hl, (_%0)" :: "r" (x));
 	return _abs24(x);
 }
 
@@ -68,9 +67,4 @@ static inline int8_t lu_cosneg(uint8_t x) {
 	// Add 64 to the a register; cos(x) = sin(x + 64) (assuming there's 256 total angles...)
 	asm("add a, 64");
 	return _getSinCosNeg();
-}
-
-static inline int24_t tex_OffCalc(uint8_t texX) {
-	asm("ld a, %0" :: "r" (texX));
-	return _texOffCalc();
 }

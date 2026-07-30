@@ -4,6 +4,43 @@
 
 MapSize := 24
 
+; Ensure that a = 0 and carry = 0 before running...
+.macro MUL24CODE_FRACTIONAL_ONLY
+	push de
+	; ------ Whole bit (ignored for this...) ------
+	sbc hl,hl
+
+	; de = b*e
+	ld d,b
+	mlt de
+
+	add hl,de ; add to result
+
+	; ------ Fractional bit of a ------
+	;ld de,(iy+6)
+	;ld d,a
+	pop de
+
+	push de
+	; de = d*c (whole)
+	ld e,c
+	mlt de
+
+	add hl,de ; add to result
+
+	; load e
+	pop de
+	;ld e,(iy+6) ; 4 cycles
+
+	; de = c*e (fractional)
+	ld d,c
+	mlt de
+	; de /= 256
+	ld e,d
+	ld d,a ; d = 0
+	add hl,de ; add to result
+.endm
+
     ; F_rayDirX is negative
 SIDEDISTXMUL_NEG:
     MUL8CODE ; result stored in hl (F_sideDistX)
@@ -15,14 +52,12 @@ SIDEDISTXMUL_NEG:
     ; F_rayDirX is positive
 SIDEDISTXMUL_POS:
     ; (-pos)-1
-    neg
-    dec a
+	cpl
 
     MUL8CODE
 
     ; bc = stepX
     ld bc,MapSize
-	cp a,a     ; ensure that z flag is set
     ret
 
     ; F_rayDirY is negative
@@ -36,14 +71,12 @@ SIDEDISTYMUL_NEG:
     ; F_rayDirY is positive
 SIDEDISTYMUL_POS:
     ; (-pos)-1
-    neg
-    dec a
+	cpl
 
     MUL8CODE
 
     ; bc' = stepY
     ld bc,1
-	cp a,a     ; ensure that z flag is set
     ret
 
 ; ------------------------------------------------
@@ -53,8 +86,8 @@ SIDEDISTYMUL_POS:
 	.global _raycast
 	.type _raycast, @function
 _raycast:
-    ld iy,0
-    add iy,sp
+    ;ld iy,0
+    ;add iy,sp
 	push ix
 
 	; Setup for map pointer (ix)
@@ -63,51 +96,56 @@ _raycast:
     ; ---------- F_sideDistX setup ----------
 
     ; de = mapX (posX high byte)
-	ld d,(iy+16)
+    ld a,(_posX+1)
+    ld d,a
 	ld e,MapSize
 	mlt de
 	add ix,de    ; offset map pointer by mapX*MapSize
 
 
-    ; a = (uint8_t)posX
-    ld a,(iy+15)
-
     ; de = F_deltaDistX
-    ld de,(iy+9)
+    ld de,(_F_deltaDistX)
 
-    ; bc = F_rayDirX
-    ld bc,(iy+3)
+    ; a = F_rayDirX (high byte)
+    ld a,(_F_rayDirX+1)
+
+	or a,a                  ; set sign flag, carry = 0
+    ; a = (uint8_t)posX
+    ld a,(_posX)
 
     ; hl = F_sideDistX
     ; bc = stepX
-    bit 7,b
-    call z,SIDEDISTXMUL_POS ; F_rayDirX is positive
-    call nz,SIDEDISTXMUL_NEG ; F_rayDirX is negative
+    call p,SIDEDISTXMUL_POS ; F_rayDirX is positive
+    call m,SIDEDISTXMUL_NEG ; F_rayDirX is negative
 
     ; ---------- F_sideDistY setup ----------
 	; swap registers
 	exx
 
     ; de' = mapY (posY high byte)
-	ld de,0
-    ld e,(iy+19)
+    ; de = 0
+    sbc hl,hl
+    ex de,hl
+
+    ;ld e,(iy+19)
+    ld a,(_posY+1)
+    ld e,a
 	add ix,de    ; offset map pointer by mapY
 
-
-    ; a' = (uint8_t)posY
-    ld a,(iy+18)
-
     ; de' = F_deltaDistY
-    ld de,(iy+12)
+    ld de,(_F_deltaDistY)
 
     ; bc' = F_rayDirY
-    ld bc,(iy+6)
+    ld a,(_F_rayDirY+1)
+
+	or a,a                  ; set sign flag, carry = 0
+    ; a' = (uint8_t)posY
+    ld a,(_posY)
 
     ; hl' = F_sideDistY
     ; bc' = stepY
-    bit 7,b
-    call z,SIDEDISTYMUL_POS ; F_rayDirY is positive
-    call nz,SIDEDISTYMUL_NEG ; F_rayDirY is negative
+    call p,SIDEDISTYMUL_POS ; F_rayDirY is positive
+    call m,SIDEDISTYMUL_NEG ; F_rayDirY is negative
 
 	; unswap registers
 	exx
@@ -135,8 +173,8 @@ SIDEDISTYBIGGER:
 	add ix,bc ; map pointer += stepX
 
 	; Check if we hit a wall
-	ld a,(ix)
-	or a,a
+    sub a,a      ; a = 0
+    or a,(ix)    ; set z flag... (and carry = 0)
 	jr z,RAYLOOP ; not hit a wall? jump back to beginning
 	;jr ENDOFLOOP_Y ; else, jump to end
 
@@ -144,46 +182,47 @@ ENDOFLOOP_Y:
 	; hl -= de
 	sbc hl,de
 
-	ld ix,(_texture_pointer)
-
-	ld b,0
-	ld c,b
-
-	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
-	dec a
-	ld d,$20
-	ld e,a
-	mlt de
-	ld d,e
-	ld e,c ; e = 0
-	add ix,de
-
 	; bc = hl (F_perpWallDist)
-	ld a,c ; a = 0 (for multiplication later...)
 	ld b,h
 	ld c,l
 
 	push hl
 
+	ld ix,(_texture_pointer)
+
+	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
+	; 8192 = 32*256...
+	dec a
+	rla
+	rla
+	rla
+	rla
+	rla
+	ld d,a
+	sub a,a
+	ld e,a
+	add ix,de
+
 	; de = F_rayDirY
-	ld de,(iy+6)
+    ld.sis de,(_F_rayDirY)
 
 	; hl = bc*de
-	call CHECK2
+	;call AFTER_CHECK2
+	MUL24CODE_FRACTIONAL_ONLY
 
 	; a = (uint8_t)hl
-	ld a,l
-	add a,(iy+18)
+    ld a,(_posY)
+    add a,l
 
-	bit 7,(iy+5)
-	jr nz,AFTER_FLIP_CHECK_Y ; skip these lines if F_rayDirX is negative
+    ld.sis hl,(_F_rayDirX)
+    bit 7,h
+	jr nz,AFTER_FLIP_CHECK_Y ; skip this line if F_rayDirX is negative
 
-	neg
-	dec a
+	cpl
 
 AFTER_FLIP_CHECK_Y:
 	; convert 0-255 range to 0-63 range
-	and a,252
+	and a,%11111100
 	ld d,a
 	ld e,16
 	mlt de
@@ -207,9 +246,9 @@ SIDEDISTXBIGGER:
 	exx
 
 	; Check if we hit a wall
-	ld a,(ix)
-	or a,a
-	jr z,RAYLOOP
+    sub a,a      ; a = 0
+    or a,(ix)    ; set z flag... (and carry = 0)
+	jr z,RAYLOOP ; not hit a wall? jump back to beginning
 	;jr ENDOFLOOP_X
 
 ENDOFLOOP_X:
@@ -217,52 +256,49 @@ ENDOFLOOP_X:
 	exx       ; swap
 	sbc hl,de
 
-	ld ix,(_texture_pointer)
-
-	ld b,0
-	ld c,b
-
-	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
-	dec a
-	ld d,$20
-	ld e,a
-	mlt de
-	ld d,e
-	ld e,c ; e = 0
-	add ix,de
-
 	; bc = hl (F_perpWallDist)
-	ld a,c ; a = 0 (for multiplication later...)
 	ld b,h
 	ld c,l
 
 	push hl
 
+	ld ix,(_texture_shadow_pointer)
+
+	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
+	; 8192 = 32*256...
+	dec a
+	rla
+	rla
+	rla
+	rla
+	rla
+	ld d,a
+	sub a,a
+	ld e,a
+	add ix,de
+
 	; de = F_rayDirX
-	ld de,(iy+3)
+	ld.sis de,(_F_rayDirX)
 
 	; hl = bc*de
-	call CHECK2
-	ld a,l
-	add a,(iy+15) ; a += posX
+	;call CHECK2
+	MUL24CODE_FRACTIONAL_ONLY
+    ld a,(_posX)
+    add a,l
 
-	bit 7,(iy+8)
-	jr z,AFTER_FLIP_CHECK_X ; skip these lines if F_rayDirY is negative
+    ld.sis hl,(_F_rayDirY)
+    bit 7,h
+	jr z,AFTER_FLIP_CHECK_X ; skip this line if F_rayDirY is positive
 
-	neg
-	dec a
+	cpl
 
 AFTER_FLIP_CHECK_X:
 	; convert 0-255 range to 0-63 range
-	and a,252
+	and a,%11111100
 	ld d,a
 	ld e,16
 	mlt de
 
-	add ix,de
-
-	; offset for shadows...
-	ld de,64*64
 	add ix,de
 
 	ld (_texture_pointer),ix

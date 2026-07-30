@@ -50,30 +50,18 @@ __getSinCosNeg:
 	.type __abs24, @function
 __abs24:
 	; return absolute value of an int24
-	;ld iy,0
-	;add iy,sp
+	ld iy,0
+	add iy,sp
+
+    ld hl,(iy+3)
 
 	bit 7,h ; positive? return
 	ret z
 
-	scf
-	ccf
+    or a,a ; carry = 0
 	ex de,hl
 	sbc hl,hl
 	sbc hl,de
-
-	ret
-
-	.section .text.__texOffCalc
-	.global __texOffCalc
-	.type __texOffCalc, @function
-__texOffCalc:
-	; a = texX
-	; 252 = 1111 1100 (in binary)
-	and a,252
-	ld h,a
-	ld l,16
-	mlt hl
 
 	ret
 
