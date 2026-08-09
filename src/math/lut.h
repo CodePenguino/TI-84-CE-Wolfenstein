@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-const uint24_t div_lut[1024] = {
+const uint16_t div_lut[1024] = {
     32767,
     32767,
     32767,

@@ -130,17 +130,17 @@ _fxmul24abs:
 	ret
 
 .macro MUL24CODE
-	; Ensure that a = 0
-	sub a,a
+	ld a,e
+	ex af,af'
+	ld a,d
 
-	push de
 	; ------ Whole bit of a ------
 	; hl = b*d
 	ld h,b
 	ld l,d
 	mlt hl
 	ld h,l
-	ld l,a ; l = 0
+	ld l,0 ; l = 0
 
 	; de = b*e
 	ld d,b
@@ -149,27 +149,25 @@ _fxmul24abs:
 	add hl,de ; add to result
 
 	; ------ Fractional bit of a ------
-	;ld de,(iy+6)
-	;ld d,a
-	pop de
+	;ex af,af'
+	ld e,a
 
-	push de
-	; de = d*c (whole)
-	ld e,c
+	; de = c*d (whole)
+	ld d,c
 	mlt de
 
 	add hl,de ; add to result
 
 	; load e
-	pop de
-	;ld e,(iy+6) ; 4 cycles
+	ex af,af'
+	ld e,a
 
 	; de = c*e (fractional)
 	ld d,c
 	mlt de
 	; de /= 256
 	ld e,d
-	ld d,a ; d = 0
+	ld d,0 ; d = 0
 	add hl,de ; add to result
 .endm
 

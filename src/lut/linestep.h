@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-const uint24_t texture_lut_u24[180] = {
+const uint16_t texture_lut_u24[180] = {
     16384,
     8192,
     5461,
@@ -1031,7 +1031,7 @@ const uint8_t texture_lut_u8[844] = {
     16,
 };
 
-const uint24_t texture_offset_lut[844] = {
+const uint16_t texture_offset_lut[844] = {
     45,
     90,
     134,
@@ -1876,7 +1876,7 @@ const uint24_t texture_offset_lut[844] = {
     6749,
     6750,
 };
-const uint24_t line_length_lut[180] = {
+const uint16_t line_length_lut[180] = {
     1260,
     1260,
     1246,
@@ -2058,7 +2058,7 @@ const uint24_t line_length_lut[180] = {
     14,
     14,
 };
-const int24_t camera_x_lut[160] = {
+const int16_t camera_x_lut[160] = {
     -256,
     -252,
     -249,

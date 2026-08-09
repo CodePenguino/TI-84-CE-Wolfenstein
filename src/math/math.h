@@ -30,15 +30,10 @@ extern "C" {
 #endif
 extern int8_t _getSinCos();
 extern int8_t _getSinCosNeg();
-extern uint24_t _abs24(uint24_t x);
+extern uint24_t abs24(int24_t x);
 #ifdef __cplusplus
 }
 #endif
-
-static inline int24_t abs24(uint24_t x) {
-	//asm("ld hl, (_%0)" :: "r" (x));
-	return _abs24(x);
-}
 
 static inline int8_t lu_sin(uint8_t x) {
 	// Load x variable into the a register

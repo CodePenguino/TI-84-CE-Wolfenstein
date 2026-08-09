@@ -4,9 +4,12 @@
 
 MapSize := 24
 
-; Ensure that a = 0 and carry = 0 before running...
+; Ensure that carry = 0 before running...
 .macro MUL24CODE_FRACTIONAL_ONLY
-	push de
+	; Store original copy of de in af and af'
+	ld a,e
+	ex af,af'
+	ld a,d
 	; ------ Whole bit (ignored for this...) ------
 	sbc hl,hl
 
@@ -17,27 +20,25 @@ MapSize := 24
 	add hl,de ; add to result
 
 	; ------ Fractional bit of a ------
-	;ld de,(iy+6)
-	;ld d,a
-	pop de
+	;ex af,af'
+	ld e,a
 
-	push de
-	; de = d*c (whole)
-	ld e,c
+	; de = c*d (whole)
+	ld d,c
 	mlt de
 
 	add hl,de ; add to result
 
 	; load e
-	pop de
-	;ld e,(iy+6) ; 4 cycles
+	ex af,af'
+	ld e,a
 
 	; de = c*e (fractional)
 	ld d,c
 	mlt de
 	; de /= 256
 	ld e,d
-	ld d,a ; d = 0
+	ld d,0 ; d = 0
 	add hl,de ; add to result
 .endm
 
@@ -93,47 +94,18 @@ _raycast:
 	; Setup for map pointer (ix)
 	ld ix,_Map
 
-    ; ---------- F_sideDistX setup ----------
-
-    ; de = mapX (posX high byte)
-    ld a,(_posX+1)
-    ld d,a
-	ld e,MapSize
-	mlt de
-	add ix,de    ; offset map pointer by mapX*MapSize
-
-
-    ; de = F_deltaDistX
-    ld de,(_F_deltaDistX)
-
-    ; a = F_rayDirX (high byte)
-    ld a,(_F_rayDirX+1)
-
-	or a,a                  ; set sign flag, carry = 0
-    ; a = (uint8_t)posX
-    ld a,(_posX)
-
-    ; hl = F_sideDistX
-    ; bc = stepX
-    call p,SIDEDISTXMUL_POS ; F_rayDirX is positive
-    call m,SIDEDISTXMUL_NEG ; F_rayDirX is negative
-
     ; ---------- F_sideDistY setup ----------
-	; swap registers
-	exx
-
     ; de' = mapY (posY high byte)
     ; de = 0
-    sbc hl,hl
-    ex de,hl
+    ld de,0
 
     ;ld e,(iy+19)
     ld a,(_posY+1)
     ld e,a
-	add ix,de    ; offset map pointer by mapY
+	add ix,de               ; offset map pointer by mapY
 
     ; de' = F_deltaDistY
-    ld de,(_F_deltaDistY)
+    ld.sis de,(_F_deltaDistY)
 
     ; bc' = F_rayDirY
     ld a,(_F_rayDirY+1)
@@ -147,8 +119,30 @@ _raycast:
     call p,SIDEDISTYMUL_POS ; F_rayDirY is positive
     call m,SIDEDISTYMUL_NEG ; F_rayDirY is negative
 
-	; unswap registers
-	exx
+    exx
+
+    ; ---------- F_sideDistX setup ----------
+    ; de = mapX (posX high byte)
+    ld a,(_posX+1)
+    ld d,a
+	ld e,MapSize
+	mlt de
+	add ix,de               ; offset map pointer by mapX*MapSize
+
+    ; de = F_deltaDistX
+    ld.sis de,(_F_deltaDistX)
+
+    ; a = F_rayDirX (high byte)
+    ld a,(_F_rayDirX+1)
+
+	or a,a                  ; set sign flag, carry = 0
+    ; a = (uint8_t)posX
+    ld a,(_posX)
+
+    ; hl = F_sideDistX
+    ; bc = stepX
+    call p,SIDEDISTXMUL_POS ; F_rayDirX is positive
+    call m,SIDEDISTXMUL_NEG ; F_rayDirX is negative
 
 	; ---------- The loop ----------
 
@@ -193,21 +187,18 @@ ENDOFLOOP_Y:
 	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
 	; 8192 = 32*256...
 	dec a
-	rla
-	rla
-	rla
-	rla
-	rla
+    rra
+    rra
+    rra
+    rra
 	ld d,a
-	sub a,a
-	ld e,a
-	add ix,de
+	ld e,0
+	add ix,de ; carry = 0
 
 	; de = F_rayDirY
     ld.sis de,(_F_rayDirY)
 
 	; hl = bc*de
-	;call AFTER_CHECK2
 	MUL24CODE_FRACTIONAL_ONLY
 
 	; a = (uint8_t)hl
@@ -267,21 +258,18 @@ ENDOFLOOP_X:
 	; offset by 8192 (64*64*2) * whatever value we hit (minus 1)
 	; 8192 = 32*256...
 	dec a
-	rla
-	rla
-	rla
-	rla
-	rla
+    rra
+    rra
+    rra
+    rra
 	ld d,a
-	sub a,a
-	ld e,a
+	ld e,0
 	add ix,de
 
 	; de = F_rayDirX
 	ld.sis de,(_F_rayDirX)
 
 	; hl = bc*de
-	;call CHECK2
 	MUL24CODE_FRACTIONAL_ONLY
     ld a,(_posX)
     add a,l

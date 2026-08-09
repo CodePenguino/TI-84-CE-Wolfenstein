@@ -13,10 +13,9 @@ uint8_t RENDER_x;
 
 uint16_t RENDER_length;
 
-uint24_t RENDER_tex_length;
-uint24_t RENDER_other_length;
-uint24_t RENDER_texture_offset;
-uint24_t RENDER_delta;
+uint16_t RENDER_tex_length;
+uint16_t RENDER_texture_offset;
+uint16_t RENDER_delta;
 
 /**
  * Sets a color pixel
@@ -38,7 +37,6 @@ extern void _gfx_TexturedVertLine_Full();
 static inline void gfx_TexturedVertLine() {
 	if(RENDER_length < 180) {
         RENDER_tex_length = line_length_lut[RENDER_length];
-        RENDER_other_length = RENDER_length;
         RENDER_delta = texture_lut_u24[RENDER_length];
 
 		_gfx_TexturedVertLine_Partial();

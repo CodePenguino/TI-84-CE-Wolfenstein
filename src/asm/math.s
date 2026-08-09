@@ -45,20 +45,19 @@ __getSinCosNeg:
 	neg        ; negate if greater
 	ret
 
-	.section .text.__abs24
-	.global __abs24
-	.type __abs24, @function
-__abs24:
+	.section .text._abs24
+	.global _abs24
+	.type _abs24, @function
+_abs24:
 	; return absolute value of an int24
 	ld iy,0
-	add iy,sp
+	add iy,sp ; carry = 0
 
     ld hl,(iy+3)
 
-	bit 7,h ; positive? return
+	bit 7,h   ; positive? return
 	ret z
 
-    or a,a ; carry = 0
 	ex de,hl
 	sbc hl,hl
 	sbc hl,de

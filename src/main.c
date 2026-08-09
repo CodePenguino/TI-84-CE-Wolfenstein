@@ -30,11 +30,12 @@ int main(void) {
 	time_enable();
 	//texture_init();
 
+	set_scaled_mode();
+
 	// Draw blue border
+    //gfx_FillScreen(1)
 	memset(gfx_vram, 1, 160*240);
 	memset(gfx_vram+(320*240), 1, 160*240);
-
-	set_scaled_mode();
 
 	int8_t dirX, dirY;
 
@@ -44,12 +45,12 @@ int main(void) {
 		key_update();
 
 		if(key_pressed(kb_Up)) {
-			posX += fxmul8(dirX, 128);
-			posY += fxmul8(dirY, 128);
+			posX += dirX/2;//fxmul8(dirX, 128);
+			posY += dirY/2;//fxmul8(dirY, 128);
 		}
 		if(key_pressed(kb_Down)) {
-			posX -= fxmul8(dirX, 128);
-			posY -= fxmul8(dirY, 128);
+			posX -= dirX/2;//fxmul8(dirX, 128);
+			posY -= dirY/2;//fxmul8(dirY, 128);
 		}
 		if(key_pressed(kb_Right)) {
 			rotation -= 4;
@@ -62,10 +63,10 @@ int main(void) {
 		dirY = lu_sinneg(rotation);
 
 		for(RENDER_x = 0; RENDER_x < 160; RENDER_x++) {
-			//calculate ray position and direction
-			fixed24 cameraX = camera_x_lut[RENDER_x]; //x-coordinate in camera space
-			F_rayDirX = ((dirX*2) + fxmul24(dirY*2, cameraX));
-			F_rayDirY = ((dirY*2) - fxmul24(dirX*2, cameraX));
+			// calculate ray position and direction
+			camera_x = camera_x_lut[RENDER_x]; //x-coordinate in camera space
+			F_rayDirX = ((dirX*2) + fxmul24(dirY*2, camera_x));
+			F_rayDirY = ((dirY*2) - fxmul24(dirX*2, camera_x));
 
 			F_deltaDistX = div_lut[abs24(F_rayDirX)];
 			F_deltaDistY = div_lut[abs24(F_rayDirY)];
@@ -78,13 +79,8 @@ int main(void) {
 
 		//gfx_SetPixel2_NoClip(0, 180, time_get_fps());
 
-		//gfx_palette[1] = time_get_fps() << 11;
+		//sprintf(((char*)0xFB0000), "%hu\n", time_get_fps());
 		//timer_1_Counter = 0;
-
-		//#ifdef DEBUG
-		//dbg_printf("%lu\n", time_get_fps());
-		//timer_1_Counter = 0;
-		//#endif
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));

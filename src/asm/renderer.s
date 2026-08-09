@@ -69,7 +69,7 @@ __gfx_TexturedVertLine_Partial:
 
 	ld  a,0xEC                       ; Sets ceiling color
 
-    ld.sis bc,(_RENDER_other_length) ; bc = other_length
+    ld.sis bc,(_RENDER_length)       ; bc = other_length
 	res 0,c                          ; make sure other_length is even
 
 	ld  iy,drawVertLine
@@ -80,8 +80,7 @@ __gfx_TexturedVertLine_Partial:
     ld  de,(_texture_pointer)        ; de' = texture pointer
 	ld  h,e
 	ld  l,0                          ; hl' = texture pointer (fixed point)
-	; (e must be zero if memory aligned...)
-    ld.sis bc,(_RENDER_delta)       ; bc' = delta (fixed point)
+    ld.sis bc,(_RENDER_delta)        ; bc' = delta (fixed point)
 	exx
 
 	call __gfx_VertLine_NoClip
@@ -103,7 +102,7 @@ drawVertTex:
 	ret nz
 
 drawFloor:
-	ld  a,0x19                    ; Sets floor color
+	ld  a,0x19                       ; Sets floor color
 
 	ld  iy,drawVertLine
 	add iy,bc
@@ -115,14 +114,14 @@ drawFloor:
 	.type __gfx_TexturedVertLine_Full, @function
 
 __gfx_TexturedVertLine_Full:
-	ld  hl,(CurrentBuffer)          ; Set hl to current video buffer
+	ld  hl,(CurrentBuffer)             ; Set hl to current video buffer
     ld  a,(_RENDER_x)
     ld  l,a
 
 	exx
-    ld.sis  hl,(_RENDER_texture_offset) ; hl' = texture offset (in fixed point)
-	ld  de,(_texture_pointer)       ; de' = texture pointer
-    ld.sis  bc,(_RENDER_delta)          ; bc' = texture delta
+    ld.sis hl,(_RENDER_texture_offset) ; hl' = texture offset (in fixed point)
+	ld  de,(_texture_pointer)          ; de' = texture pointer
+    ld.sis bc,(_RENDER_delta)          ; bc' = texture delta
 
 	; I wish you could do "add de,h" but instead I need to do this
 	ld  a,e
@@ -132,13 +131,14 @@ __gfx_TexturedVertLine_Full:
 	ld  h,e
 	exx
 
-	ld  de,ScreenWidth              ; de = screen width
+	ld  de,ScreenWidth                 ; de = screen width
 
-    or a,e                          ; ensure that z = nz
+    or a,e                             ; ensure that z flag = nz
 	jp drawVertTex
 
 	; Draws a colored vertical line
 __gfx_VertLine_NoClip:
+
 	jp (iy)
 
 	; Same unrolled loop trick as used for the textured line
