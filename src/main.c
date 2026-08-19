@@ -33,7 +33,6 @@ int main(void) {
 	set_scaled_mode();
 
 	// Draw blue border
-    //gfx_FillScreen(1)
 	memset(gfx_vram, 1, 160*240);
 	memset(gfx_vram+(320*240), 1, 160*240);
 
@@ -79,8 +78,15 @@ int main(void) {
 
 		//gfx_SetPixel2_NoClip(0, 180, time_get_fps());
 
-		//sprintf(((char*)0xFB0000), "%hu\n", time_get_fps());
-		//timer_1_Counter = 0;
+		//texture_pointer = (uint8_t*)door_texture_data;
+		//for(RENDER_x = 0; RENDER_x < 160; RENDER_x++) {
+		//	RENDER_length = rotation;
+		//	gfx_TexturedVertLine();
+		//	texture_pointer += 64;
+		//}
+
+		sprintf(((char*)0xFB0000), "%hu\n", time_get_fps());
+		timer_1_Counter = 0;
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));

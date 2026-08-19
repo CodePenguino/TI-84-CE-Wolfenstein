@@ -17,26 +17,26 @@ if os.path.exists("delta.txt"):
     os.remove("delta.txt")
 
 with open("delta.txt", "a") as f:
-    f.write("const uint24_t texture_lut_u24[")
-    f.write(str(180))
-    f.write("] = {\n")
-
-    for x in range(1, 181):
-        f.write("    ")
-        f.write(str(float2fx(TEXTURE_HEIGHT / x)))
-        # f.write(str(fxdiv(TEXTURE_HEIGHT, x)))
-        f.write(",\n")
-
-    f.write("};\n\n")
+#    f.write("const uint24_t texture_lut_u24[")
+#    f.write(str(180))
+#    f.write("] = {\n")
+#
+#    for x in range(1, 181):
+#        f.write("    ")
+#        f.write(str(float2fx(TEXTURE_HEIGHT / x)))
+#        # f.write(str(fxdiv(TEXTURE_HEIGHT, x)))
+#        f.write(",\n")
+#
+#    f.write("};\n\n")
 
 # ----------------------------------------
-    f.write("const uint8_t texture_lut_u8[")
+    f.write("const uint16_t texture_lut[")
     f.write(str(NUM_ELEMENTS-180))
     f.write("] = {\n")
 
-    for x in range(181, NUM_ELEMENTS):
+    for x in range(180, NUM_ELEMENTS):
         f.write("    ")
-        f.write(str(float2fx(TEXTURE_HEIGHT / x)))
+        f.write(str(float2fx((TEXTURE_HEIGHT / x)*3)))
         f.write(",\n")
 
     f.write("};\n\n")
@@ -46,7 +46,7 @@ with open("delta.txt", "a") as f:
     f.write(str(NUM_ELEMENTS-180))
     f.write("] = {\n")
 
-    for x in range(181, NUM_ELEMENTS):
+    for x in range(180, NUM_ELEMENTS):
         f.write("    ")
         step_size = float(TEXTURE_HEIGHT / x)
         f.write(str(float2fx(((x-180)/2)*step_size)))

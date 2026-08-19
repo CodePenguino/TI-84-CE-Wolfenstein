@@ -27,6 +27,7 @@ uint16_t RENDER_delta;
 extern void gfx_SetPixel2_NoClip(uint8_t x, uint8_t y, uint8_t c);
 
 extern void _gfx_TexturedVertLine_Partial();
+extern void _gfx_TexturedVertLine_Partial2();
 extern void _gfx_TexturedVertLine_Full();
 
 #ifdef __cplusplus
@@ -36,14 +37,16 @@ extern void _gfx_TexturedVertLine_Full();
 // Draw a vertical line on the screen
 static inline void gfx_TexturedVertLine() {
 	if(RENDER_length < 180) {
-        RENDER_tex_length = line_length_lut[RENDER_length];
-        RENDER_delta = texture_lut_u24[RENDER_length];
+		_gfx_TexturedVertLine_Partial2();
+        //RENDER_tex_length = line_length_lut[RENDER_length];
+        //RENDER_delta = texture_lut_u24[RENDER_length];
 
-		_gfx_TexturedVertLine_Partial();
+		//_gfx_TexturedVertLine_Partial();
 	} else {
+		// TODO: Swap these for assembly instructions...
 		RENDER_length -= 180;
         RENDER_texture_offset = texture_offset_lut[RENDER_length];
-        RENDER_delta = texture_lut_u8[RENDER_length];
+        RENDER_delta = texture_lut[RENDER_length];
 
 		_gfx_TexturedVertLine_Full();
 	}

@@ -1,11 +1,12 @@
 	.assume adl=1
+	.include "src/asm/vline.asm"
 
 CurrentBuffer      := 0E30014h
 ScreenWidth        := 160
 
 ; The assembler couldn't handle a 180-repeat loop
 ; so the code had to be duplicated...
-.macro texmac from=1, to=90
+.macro texmac from=1, to=60
 	exx
 	add hl,bc
 	ld  e,h
@@ -14,13 +15,8 @@ ScreenWidth        := 160
 
 	ld (hl),a
 	add hl,de
-
-	exx
-	add hl,bc
-	ld  e,h
-	ld  a,(de)
-	exx
-
+	ld (hl),a
+	add hl,de
 	ld (hl),a
 	add hl,de
 
@@ -56,58 +52,140 @@ _gfx_SetPixel2_NoClip:
 	ld	(hl),a             ; set the pixel color
 	ret
 
-
-	.section .text.__gfx_TexturedVertLine_Partial
-	.global __gfx_TexturedVertLine_Partial
-	.type __gfx_TexturedVertLine_Partial, @function
-
-__gfx_TexturedVertLine_Partial:
-	ld  hl,(CurrentBuffer)           ; Set hl to current video buffer
-    ; hl += x
-    ld  a,(_RENDER_x)
-    ld  l,a
-
-	ld  a,0xEC                       ; Sets ceiling color
+	.section .text.__gfx_TexturedVertLine_Partial2
+	.global __gfx_TexturedVertLine_Partial2
+	.type __gfx_TexturedVertLine_Partial2, @function
+__gfx_TexturedVertLine_Partial2:
+	ld  hl,(CurrentBuffer)
+	; hl += x
+	ld  a,(_RENDER_x)
+	ld  l,a
 
     ld.sis bc,(_RENDER_length)       ; bc = other_length
 	res 0,c                          ; make sure other_length is even
 
 	ld  iy,drawVertLine
 	add iy,bc
-    ld  de,ScreenWidth               ; de = ScreenWidth
 
-	exx
-    ld  de,(_texture_pointer)        ; de' = texture pointer
-	ld  h,e
-	ld  l,0                          ; hl' = texture pointer (fixed point)
-    ld.sis bc,(_RENDER_delta)        ; bc' = delta (fixed point)
-	exx
+	push iy
+
+	ld a,0xEC                        ; sets ceiling color
+
+	ld  de,ScreenWidth
 
 	call __gfx_VertLine_NoClip
 
-    ld.sis  de,(_RENDER_tex_length)
+	ld iy,PARTIAL_JUMPTABLE
+	add iy,bc
+	add iy,bc
 
-	ld  iy,drawVertTex
-	add iy,de
+    ld  bc,(_texture_pointer)        ; bc = texture pointer
 
-	ld  de,ScreenWidth               ; de = screen width = 160
-    xor a,a                          ; ensure that z = 0
+	ld  a,(bc)
+
+	call __gfx_VertLine_NoClip
+
+	pop iy
+
+	ld a,0x19                        ; sets floor color
 
 	jp (iy)
+
+PARTIAL_JUMPTABLE:
+	jp vline_0
+	jp vline_2
+	jp vline_4
+	jp vline_6
+	jp vline_8
+	jp vline_10
+	jp vline_12
+	jp vline_14
+	jp vline_16
+	jp vline_18
+	jp vline_20
+	jp vline_22
+	jp vline_24
+	jp vline_26
+	jp vline_28
+	jp vline_30
+	jp vline_32
+	jp vline_34
+	jp vline_36
+	jp vline_38
+	jp vline_40
+	jp vline_42
+	jp vline_44
+	jp vline_46
+	jp vline_48
+	jp vline_50
+	jp vline_52
+	jp vline_54
+	jp vline_56
+	jp vline_58
+	jp vline_60
+	jp vline_62
+	jp vline_64
+	jp vline_66
+	jp vline_68
+	jp vline_70
+	jp vline_72
+	jp vline_74
+	jp vline_76
+	jp vline_78
+	jp vline_80
+	jp vline_82
+	jp vline_84
+	jp vline_86
+	jp vline_88
+	jp vline_90
+	jp vline_92
+	jp vline_94
+	jp vline_96
+	jp vline_98
+	jp vline_100
+	jp vline_102
+	jp vline_104
+	jp vline_106
+	jp vline_108
+	jp vline_110
+	jp vline_112
+	jp vline_114
+	jp vline_116
+	jp vline_118
+	jp vline_120
+	jp vline_122
+	jp vline_124
+	jp vline_126
+	jp vline_128
+	jp vline_130
+	jp vline_132
+	jp vline_134
+	jp vline_136
+	jp vline_138
+	jp vline_140
+	jp vline_142
+	jp vline_144
+	jp vline_146
+	jp vline_148
+	jp vline_150
+	jp vline_152
+	jp vline_154
+	jp vline_156
+	jp vline_158
+	jp vline_160
+	jp vline_162
+	jp vline_164
+	jp vline_166
+	jp vline_168
+	jp vline_170
+	jp vline_172
+	jp vline_174
+	jp vline_176
+	jp vline_178
 
 drawVertTex:
 	texmac
-
-	; Used to check if we should return early or not...
-	ret nz
-
-drawFloor:
-	ld  a,0x19                       ; Sets floor color
-
-	ld  iy,drawVertLine
-	add iy,bc
-
-	jp (iy)
+	ret
 
 	.section .text.__gfx_TexturedVertLine_Full
 	.global __gfx_TexturedVertLine_Full
@@ -133,8 +211,11 @@ __gfx_TexturedVertLine_Full:
 
 	ld  de,ScreenWidth                 ; de = screen width
 
-    or a,e                             ; ensure that z flag = nz
 	jp drawVertTex
+
+	;texmac
+	;ret
+
 
 	; Draws a colored vertical line
 __gfx_VertLine_NoClip:
