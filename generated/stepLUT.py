@@ -55,18 +55,6 @@ with open("delta.txt", "a") as f:
     f.write("};\n")
 
 # ----------------------------------------
-    f.write("const uint24_t line_length_lut[")
-    f.write(str(180))
-    f.write("] = {\n")
-
-    for x in range(0, 180):
-        f.write("    ")
-        f.write(str(1260 - (7*(x>>1 <<1))))
-        f.write(",\n")
-
-    f.write("};\n")
-
-# ----------------------------------------
     f.write("const int24_t camera_x_lut[160] = {\n")
 
     for x in range(0, 160):
@@ -75,3 +63,13 @@ with open("delta.txt", "a") as f:
         f.write(",\n")
 
     f.write("};\n")
+
+# ----------------------------------------
+    f.write("FULL_JUMPTABLE:\n")
+    for x in range(180, NUM_ELEMENTS+180):
+        f.write("    ld hl,")
+        step_size = float(TEXTURE_HEIGHT / x)
+        f.write(str(float2fx(((x-180)/2)*step_size)))
+        f.write("\n    ld bc,")
+        f.write(str(float2fx((TEXTURE_HEIGHT / x)*3)))
+        f.write("\n    jp drawVertTex\n")

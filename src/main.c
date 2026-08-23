@@ -70,23 +70,14 @@ int main(void) {
 			F_deltaDistX = div_lut[abs24(F_rayDirX)];
 			F_deltaDistY = div_lut[abs24(F_rayDirY)];
 
-            RENDER_length = 46080/raycast();
+            RENDER_length = (180*256)/raycast();
 
 			gfx_TexturedVertLine();
 			texture_pointer = (uint8_t*)door_texture_data;
 		}
 
-		//gfx_SetPixel2_NoClip(0, 180, time_get_fps());
-
-		//texture_pointer = (uint8_t*)door_texture_data;
-		//for(RENDER_x = 0; RENDER_x < 160; RENDER_x++) {
-		//	RENDER_length = rotation;
-		//	gfx_TexturedVertLine();
-		//	texture_pointer += 64;
-		//}
-
-		sprintf(((char*)0xFB0000), "%hu\n", time_get_fps());
-		timer_1_Counter = 0;
+		//sprintf(((char*)0xFB0000), "%hu\n", time_get_fps());
+		//timer_1_Counter = 0;
 
 		gfx_SwapDraw();
 	} while (!key_pressed(kb_2nd));
