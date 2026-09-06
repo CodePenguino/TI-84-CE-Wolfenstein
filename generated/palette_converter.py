@@ -3,6 +3,7 @@ import os
 FILE_NAME = "palette.txt"
 
 wolf_palette = [
+	152, 0, 136,
 	0, 0, 0,
 	0, 0, 168,
 	0, 168, 0,
@@ -258,7 +259,6 @@ wolf_palette = [
 	0, 116, 116,
 	0, 112, 112,
 	0, 108, 108,
-	152, 0, 136
 ];
 
 def combine_bytes(a, b, c):

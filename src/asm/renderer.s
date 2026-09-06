@@ -78,7 +78,7 @@ __gfx_TexturedVertLine_Partial:
 
 	push iy
 
-	ld  a,0xEC                       ; sets ceiling color
+	ld  a,0xED                       ; sets ceiling color
 
 	ld  de,ScreenWidth
 
@@ -96,7 +96,7 @@ __gfx_TexturedVertLine_Partial:
 
 	pop iy
 
-	ld a,0x19                        ; sets floor color
+	ld a,0x1A                        ; sets floor color
 
 	jp (iy)
 

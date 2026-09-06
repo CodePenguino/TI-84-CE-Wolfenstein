@@ -33,8 +33,8 @@ int main(void) {
 	set_scaled_mode();
 
 	// Draw blue border
-	memset(gfx_vram, 1, 160*240);
-	memset(gfx_vram+(320*240), 1, 160*240);
+	memset(gfx_vram, 2, 160*240);
+	memset(gfx_vram+(320*240), 2, 160*240);
 
 	int8_t dirX, dirY;
 
@@ -70,9 +70,10 @@ int main(void) {
 			F_deltaDistX = div_lut[abs24(F_rayDirX)];
 			F_deltaDistY = div_lut[abs24(F_rayDirY)];
 
-            RENDER_length = (180*256)/raycast();
+			//dbg_Debugger();
+			raycast_and_draw();
 
-			gfx_TexturedVertLine();
+			//gfx_TexturedVertLine();
 			texture_pointer = (uint8_t*)door_texture_data;
 		}
 

@@ -4,6 +4,20 @@
 
 MapSize := 24
 
+.macro divcode from=1, to=16
+	sla c
+	rla
+	adc hl,hl
+	sbc hl,de
+	jr nc,$+4
+	add hl,de
+	dec c
+
+	.if \to-\from
+	divcode "(\from+1)",\to
+	.endif
+.endm
+
 ; Ensure that carry = 0 before running...
 .macro MUL24CODE_FRACTIONAL_ONLY
 	; Store original copy of de in af and af'
@@ -295,6 +309,32 @@ AFTER_FLIP_CHECK_X:
 
 	pop ix
 	ret
+
+	.section .text._raycast_and_draw
+	.global _raycast_and_draw
+	.type _raycast_and_draw, @function
+_raycast_and_draw:
+	; de = raycast
+	call _raycast ; hl = raycast
+	ex de,hl      ; de = hl
+
+	ld bc,180*256
+
+	; ac = bc / de
+	; hl = 0
+	or a,a
+	sbc hl,hl
+
+	ld a,b
+
+	divcode
+
+	; bc = division result
+	ld b,a
+
+	ld.sis (_RENDER_length),bc
+
+	jp _gfx_TexturedVertLine
 
 	.section .rodata._Map
 	.global _Map

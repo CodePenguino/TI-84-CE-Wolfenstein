@@ -32,19 +32,19 @@ typedef int24_t fixed24;
 // Divide two fixed24 numbers
 #define fxdiv(a, b) (fixed24)(((a) * FIX_SCALE) / (b))
 
-// Multiply two fixed24 numbers (the first is stored as a uint8_t)
+// Multiply two fixed16 numbers (the first is stored as a uint8_t)
 // The fixed24 has to be within bounds of a signed 16-bit int
 extern fixed24 fxmul8abs(uint8_t a, fixed16 b);
 
-// Multiply two fixed 24 numbers (the first is stored as an int8_t)
+// Multiply two fixed16 numbers (the first is stored as an int8_t)
 // The fixed24 has to be within bounds of a signed 16-bit int
 extern fixed24 fxmul8(int8_t a, fixed16 b);
 
-// Multiply two fixed24 numbers (both are positive)
+// Multiply two fixed16 numbers (both are positive)
 // Both fixed24s have to be within bounds of a signed 16-bit int
 extern fixed24 fxmul24abs(fixed16 a, fixed16 b);
 
-// Multiply two fixed24 numbers (positive or negative)
+// Multiply two fixed16 numbers (positive or negative)
 // Both fixed24s have to be within bounds of a signed 16-bit int
 extern fixed24 fxmul24(fixed16 a, fixed16 b);
 

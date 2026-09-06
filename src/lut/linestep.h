@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 
+_Alignas(256)
 const int16_t camera_x_lut[160] = {
     -256,
     -252,

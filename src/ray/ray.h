@@ -20,6 +20,8 @@ uint16_t F_deltaDistY;
 
 extern uint16_t raycast();
 
+extern void raycast_and_draw();
+
 #ifdef __cplusplus
 }
 #endif
